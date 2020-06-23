@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengda.platform.dao.TaskDao">
+    <!-- 查询字段 -->
+    <sql id="fields">
+        select
+            id id,
+            process_order_no processOrderNo,
+            production_time productionTime,
+            process_order_type processOrderType,
+            plan_start_time planStartTime,
+            plan_end_time planEndTime,
+            production_type productionType,
+            production_name productionName,
+            production_code productionCode,
+            specifications specifications,
+            target_weight targetWeight,
+            finshed_weight finshedWeight,
+            batch_code batchCode,
+            employee_code employeeCode,
+            employee_id employeeId,
+            work_position workPosition,
+            customer_name customerName,
+            plant_code plantCode,
+            create_time createTime,
+            modify_time modifyTime,
+            deleted deleted
+
+    </sql>
+    <!-- （条件） -->
+    <sql id="where">
+        <where>
+                        <if test="ids != null and  ids.size > 0">
+                            and id in
+                            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                            #{item}
+                            </foreach>
+                        </if>
+                        <if test="processOrderNo != null and processOrderNo != ''">
+                            and process_order_no= #{processOrderNo,jdbcType=VARCHAR}
+                        </if>
+                        <if test="productionTime != null">
+                            and production_time= #{productionTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="processOrderType != null and processOrderType != ''">
+                            and process_order_type= #{processOrderType,jdbcType=VARCHAR}
+                        </if>
+                        <if test="planStartTime != null">
+                            and plan_start_time= #{planStartTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="planEndTime != null">
+                            and plan_end_time= #{planEndTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="productionType != null and productionType != ''">
+                            and production_type= #{productionType,jdbcType=VARCHAR}
+                        </if>
+                        <if test="productionName != null and productionName != ''">
+                            and production_name= #{productionName,jdbcType=VARCHAR}
+                        </if>
+                        <if test="productionCode != null and productionCode != ''">
+                            and production_code= #{productionCode,jdbcType=VARCHAR}
+                        </if>
+                        <if test="specifications != null and specifications != ''">
+                            and specifications= #{specifications,jdbcType=VARCHAR}
+                        </if>
+                        <if test="targetWeight != null">
+                            and target_weight= #{targetWeight,jdbcType=DECIMAL}
+                        </if>
+                        <if test="finshedWeight != null">
+                            and finshed_weight= #{finshedWeight,jdbcType=DECIMAL}
+                        </if>
+                        <if test="batchCode != null and batchCode != ''">
+                            and batch_code= #{batchCode,jdbcType=VARCHAR}
+                        </if>
+                        <if test="employeeCode != null and employeeCode != ''">
+                            and employee_code= #{employeeCode,jdbcType=VARCHAR}
+                        </if>
+                        <if test="employeeId != null">
+                            and employee_id= #{employeeId,jdbcType=BIGINT}
+                        </if>
+                        <if test="workPosition != null and workPosition != ''">
+                            and work_position= #{workPosition,jdbcType=VARCHAR}
+                        </if>
+                        <if test="customerName != null and customerName != ''">
+                            and customer_name= #{customerName,jdbcType=VARCHAR}
+                        </if>
+                        <if test="plantCode != null and plantCode != ''">
+                            and plant_code= #{plantCode,jdbcType=VARCHAR}
+                        </if>
+                        <if test="createTime != null">
+                            and create_time= #{createTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="modifyTime != null">
+                            and modify_time= #{modifyTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="deleted != null">
+                            and deleted= #{deleted,jdbcType=INTEGER}
+                        </if>
+        </where>
+    </sql>
+    <!-- （插入或更新） -->
+    <sql id="saveSet">
+        <trim prefix="" suffixOverrides=",">
+                        <if test="processOrderNo != null and processOrderNo != ''">
+                            process_order_no= #{processOrderNo,jdbcType=VARCHAR},
+                        </if>
+                        <if test="productionTime != null">
+                            production_time= #{productionTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="processOrderType != null and processOrderType != ''">
+                            process_order_type= #{processOrderType,jdbcType=VARCHAR},
+                        </if>
+                        <if test="planStartTime != null">
+                            plan_start_time= #{planStartTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="planEndTime != null">
+                            plan_end_time= #{planEndTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="productionType != null and productionType != ''">
+                            production_type= #{productionType,jdbcType=VARCHAR},
+                        </if>
+                        <if test="productionName != null and productionName != ''">
+                            production_name= #{productionName,jdbcType=VARCHAR},
+                        </if>
+                        <if test="productionCode != null and productionCode != ''">
+                            production_code= #{productionCode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="specifications != null and specifications != ''">
+                            specifications= #{specifications,jdbcType=VARCHAR},
+                        </if>
+                        <if test="targetWeight != null">
+                            target_weight= #{targetWeight,jdbcType=DECIMAL},
+                        </if>
+                        <if test="finshedWeight != null">
+                            finshed_weight= #{finshedWeight,jdbcType=DECIMAL},
+                        </if>
+                        <if test="batchCode != null and batchCode != ''">
+                            batch_code= #{batchCode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="employeeCode != null and employeeCode != ''">
+                            employee_code= #{employeeCode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="employeeId != null">
+                            employee_id= #{employeeId,jdbcType=BIGINT},
+                        </if>
+                        <if test="workPosition != null and workPosition != ''">
+                            work_position= #{workPosition,jdbcType=VARCHAR},
+                        </if>
+                        <if test="customerName != null and customerName != ''">
+                            customer_name= #{customerName,jdbcType=VARCHAR},
+                        </if>
+                        <if test="plantCode != null and plantCode != ''">
+                            plant_code= #{plantCode,jdbcType=VARCHAR},
+                        </if>
+                        <if test="createTime != null">
+                            create_time= #{createTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="modifyTime != null">
+                            modify_time= #{modifyTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="deleted != null">
+                            deleted= #{deleted,jdbcType=INTEGER},
+                        </if>
+        </trim>
+    </sql>
+
+    <!-- 插入实体 -->
+    <insert id="insert" parameterType="com.zhengda.platform.entity.Task" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into task set
+        <include refid="saveSet"/>
+    </insert>
+    <!-- 批量插入实体 -->
+    <insert id="insertList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into task
+        (
+                    process_order_no,
+                    production_time,
+                    process_order_type,
+                    plan_start_time,
+                    plan_end_time,
+                    production_type,
+                    production_name,
+                    production_code,
+                    specifications,
+                    target_weight,
+                    finshed_weight,
+                    batch_code,
+                    employee_code,
+                    employee_id,
+                    work_position,
+                    customer_name,
+                    plant_code,
+                    create_time,
+                    modify_time,
+                    deleted
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            <trim prefix="" suffixOverrides=",">
+                    #{item.processOrderNo,jdbcType=VARCHAR},
+                    #{item.productionTime,jdbcType=TIMESTAMP},
+                    #{item.processOrderType,jdbcType=VARCHAR},
+                    #{item.planStartTime,jdbcType=TIMESTAMP},
+                    #{item.planEndTime,jdbcType=TIMESTAMP},
+                    #{item.productionType,jdbcType=VARCHAR},
+                    #{item.productionName,jdbcType=VARCHAR},
+                    #{item.productionCode,jdbcType=VARCHAR},
+                    #{item.specifications,jdbcType=VARCHAR},
+                    #{item.targetWeight,jdbcType=DECIMAL},
+                    #{item.finshedWeight,jdbcType=DECIMAL},
+                    #{item.batchCode,jdbcType=VARCHAR},
+                    #{item.employeeCode,jdbcType=VARCHAR},
+                    #{item.employeeId,jdbcType=BIGINT},
+                    #{item.workPosition,jdbcType=VARCHAR},
+                    #{item.customerName,jdbcType=VARCHAR},
+                    #{item.plantCode,jdbcType=VARCHAR},
+                    #{item.createTime,jdbcType=TIMESTAMP},
+                    #{item.modifyTime,jdbcType=TIMESTAMP},
+                    #{item.deleted,jdbcType=INTEGER},
+            </trim>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 更新实体 -->
+    <update id="update" parameterType="com.zhengda.platform.entity.Task">
+        update task set
+        <include refid="saveSet"/>
+        where id = #{id}
+    </update>
+    <update id="deleteById">
+        update task
+        <set>
+            deleted=1
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 查询单个 -->
+    <select id="getById" resultType="com.zhengda.platform.entity.Task">
+        <include refid="fields"/>
+        from task
+        where id = #{id}
+    </select>
+    <!-- 查询 -->
+    <select id="getList"
+            resultType="com.zhengda.platform.entity.Task">
+        <include refid="fields"/>
+        from task
+        <include refid="where"/>
+        <if test="column != null">
+            order by ${column}  ${sort}
+        </if>
+        <if test="offset != null">
+            limit #{offset} , ${limit}
+        </if>
+    </select>
+
+
+    <!-- 查询（计数） -->
+    <select id="getCount" resultType="java.lang.Long">
+        select count(*)
+        from task
+        <include refid="where"/>
+    </select>
+</mapper>

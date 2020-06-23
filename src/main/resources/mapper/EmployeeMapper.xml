@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengda.platform.dao.EmployeeDao">
+    <!-- 查询字段 -->
+    <sql id="fields">
+        select
+            id id,
+            name name,
+            sex sex,
+            identity_card identityCard,
+            phone phone,
+            create_time createTime,
+            modify_time modifyTime,
+            deleted deleted,
+            end_time endTime,
+            employee_no employeeNo,
+            plant_code plantCode
+
+    </sql>
+    <!-- （条件） -->
+    <sql id="where">
+        <where>
+                        <if test="ids != null and  ids.size > 0">
+                            and id in
+                            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                            #{item}
+                            </foreach>
+                        </if>
+                        <if test="name != null and name != ''">
+                            and name= #{name,jdbcType=VARCHAR}
+                        </if>
+                        <if test="sex != null">
+                            and sex= #{sex,jdbcType=INTEGER}
+                        </if>
+                        <if test="identityCard != null and identityCard != ''">
+                            and identity_card= #{identityCard,jdbcType=VARCHAR}
+                        </if>
+                        <if test="phone != null and phone != ''">
+                            and phone= #{phone,jdbcType=VARCHAR}
+                        </if>
+                        <if test="createTime != null">
+                            and create_time= #{createTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="modifyTime != null">
+                            and modify_time= #{modifyTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="deleted != null">
+                            and deleted= #{deleted,jdbcType=INTEGER}
+                        </if>
+                        <if test="endTime != null">
+                            and end_time= #{endTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="employeeNo != null and employeeNo != ''">
+                            and employee_no= #{employeeNo,jdbcType=VARCHAR}
+                        </if>
+                        <if test="plantCode != null and plantCode != ''">
+                            and plant_code= #{plantCode,jdbcType=VARCHAR}
+                        </if>
+        </where>
+    </sql>
+    <!-- （插入或更新） -->
+    <sql id="saveSet">
+        <trim prefix="" suffixOverrides=",">
+                        <if test="name != null and name != ''">
+                            name= #{name,jdbcType=VARCHAR},
+                        </if>
+                        <if test="sex != null">
+                            sex= #{sex,jdbcType=INTEGER},
+                        </if>
+                        <if test="identityCard != null and identityCard != ''">
+                            identity_card= #{identityCard,jdbcType=VARCHAR},
+                        </if>
+                        <if test="phone != null and phone != ''">
+                            phone= #{phone,jdbcType=VARCHAR},
+                        </if>
+                        <if test="createTime != null">
+                            create_time= #{createTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="modifyTime != null">
+                            modify_time= #{modifyTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="deleted != null">
+                            deleted= #{deleted,jdbcType=INTEGER},
+                        </if>
+                        <if test="endTime != null">
+                            end_time= #{endTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="employeeNo != null and employeeNo != ''">
+                            employee_no= #{employeeNo,jdbcType=VARCHAR},
+                        </if>
+                        <if test="plantCode != null and plantCode != ''">
+                            plant_code= #{plantCode,jdbcType=VARCHAR},
+                        </if>
+        </trim>
+    </sql>
+
+    <!-- 插入实体 -->
+    <insert id="insert" parameterType="com.zhengda.platform.entity.Employee" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into employee set
+        <include refid="saveSet"/>
+    </insert>
+    <!-- 批量插入实体 -->
+    <insert id="insertList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into employee
+        (
+                    name,
+                    sex,
+                    identity_card,
+                    phone,
+                    create_time,
+                    modify_time,
+                    deleted,
+                    end_time,
+                    employee_no,
+                    plant_code
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            <trim prefix="" suffixOverrides=",">
+                    #{item.name,jdbcType=VARCHAR},
+                    #{item.sex,jdbcType=INTEGER},
+                    #{item.identityCard,jdbcType=VARCHAR},
+                    #{item.phone,jdbcType=VARCHAR},
+                    #{item.createTime,jdbcType=TIMESTAMP},
+                    #{item.modifyTime,jdbcType=TIMESTAMP},
+                    #{item.deleted,jdbcType=INTEGER},
+                    #{item.endTime,jdbcType=TIMESTAMP},
+                    #{item.employeeNo,jdbcType=VARCHAR},
+                    #{item.plantCode,jdbcType=VARCHAR},
+            </trim>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 更新实体 -->
+    <update id="update" parameterType="com.zhengda.platform.entity.Employee">
+        update employee set
+        <include refid="saveSet"/>
+        where id = #{id}
+    </update>
+    <update id="deleteById">
+        update employee
+        <set>
+            deleted=1
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 查询单个 -->
+    <select id="getById" resultType="com.zhengda.platform.entity.Employee">
+        <include refid="fields"/>
+        from employee
+        where id = #{id}
+    </select>
+    <!-- 查询 -->
+    <select id="getList"
+            resultType="com.zhengda.platform.entity.Employee">
+        <include refid="fields"/>
+        from employee
+        <include refid="where"/>
+        <if test="column != null">
+            order by ${column}  ${sort}
+        </if>
+        <if test="offset != null">
+            limit #{offset} , ${limit}
+        </if>
+    </select>
+
+
+    <!-- 查询（计数） -->
+    <select id="getCount" resultType="java.lang.Long">
+        select count(*)
+        from employee
+        <include refid="where"/>
+    </select>
+</mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengda.platform.dao.MachineDao">
+    <!-- 查询字段 -->
+    <sql id="fields">
+        select
+            id id,
+            status status,
+            run_time runTime,
+            code code,
+            create_time createTime,
+            modify_time modifyTime,
+            deleted deleted,
+            plant_code plantCode
+
+    </sql>
+    <!-- （条件） -->
+    <sql id="where">
+        <where>
+                        <if test="ids != null and  ids.size > 0">
+                            and id in
+                            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                            #{item}
+                            </foreach>
+                        </if>
+                        <if test="status != null">
+                            and status= #{status,jdbcType=INTEGER}
+                        </if>
+                        <if test="runTime != null and runTime != ''">
+                            and run_time= #{runTime,jdbcType=VARCHAR}
+                        </if>
+                        <if test="code != null and code != ''">
+                            and code= #{code,jdbcType=VARCHAR}
+                        </if>
+                        <if test="createTime != null">
+                            and create_time= #{createTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="modifyTime != null">
+                            and modify_time= #{modifyTime,jdbcType=TIMESTAMP}
+                        </if>
+                        <if test="deleted != null">
+                            and deleted= #{deleted,jdbcType=INTEGER}
+                        </if>
+                        <if test="plantCode != null and plantCode != ''">
+                            and plant_code= #{plantCode,jdbcType=VARCHAR}
+                        </if>
+        </where>
+    </sql>
+    <!-- （插入或更新） -->
+    <sql id="saveSet">
+        <trim prefix="" suffixOverrides=",">
+                        <if test="status != null">
+                            status= #{status,jdbcType=INTEGER},
+                        </if>
+                        <if test="runTime != null and runTime != ''">
+                            run_time= #{runTime,jdbcType=VARCHAR},
+                        </if>
+                        <if test="code != null and code != ''">
+                            code= #{code,jdbcType=VARCHAR},
+                        </if>
+                        <if test="createTime != null">
+                            create_time= #{createTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="modifyTime != null">
+                            modify_time= #{modifyTime,jdbcType=TIMESTAMP},
+                        </if>
+                        <if test="deleted != null">
+                            deleted= #{deleted,jdbcType=INTEGER},
+                        </if>
+                        <if test="plantCode != null and plantCode != ''">
+                            plant_code= #{plantCode,jdbcType=VARCHAR},
+                        </if>
+        </trim>
+    </sql>
+
+    <!-- 插入实体 -->
+    <insert id="insert" parameterType="com.zhengda.platform.entity.Machine" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into machine set
+        <include refid="saveSet"/>
+    </insert>
+    <!-- 批量插入实体 -->
+    <insert id="insertList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into machine
+        (
+                    status,
+                    run_time,
+                    code,
+                    create_time,
+                    modify_time,
+                    deleted,
+                    plant_code
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            <trim prefix="" suffixOverrides=",">
+                    #{item.status,jdbcType=INTEGER},
+                    #{item.runTime,jdbcType=VARCHAR},
+                    #{item.code,jdbcType=VARCHAR},
+                    #{item.createTime,jdbcType=TIMESTAMP},
+                    #{item.modifyTime,jdbcType=TIMESTAMP},
+                    #{item.deleted,jdbcType=INTEGER},
+                    #{item.plantCode,jdbcType=VARCHAR},
+            </trim>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 更新实体 -->
+    <update id="update" parameterType="com.zhengda.platform.entity.Machine">
+        update machine set
+        <include refid="saveSet"/>
+        where id = #{id}
+    </update>
+    <update id="deleteById">
+        update machine
+        <set>
+            deleted=1
+        </set>
+        where id = #{id}
+    </update>
+
+    <!-- 查询单个 -->
+    <select id="getById" resultType="com.zhengda.platform.entity.Machine">
+        <include refid="fields"/>
+        from machine
+        where id = #{id}
+    </select>
+    <!-- 查询 -->
+    <select id="getList"
+            resultType="com.zhengda.platform.entity.Machine">
+        <include refid="fields"/>
+        from machine
+        <include refid="where"/>
+        <if test="column != null">
+            order by ${column}  ${sort}
+        </if>
+        <if test="offset != null">
+            limit #{offset} , ${limit}
+        </if>
+    </select>
+
+
+    <!-- 查询（计数） -->
+    <select id="getCount" resultType="java.lang.Long">
+        select count(*)
+        from machine
+        <include refid="where"/>
+    </select>
+</mapper>
