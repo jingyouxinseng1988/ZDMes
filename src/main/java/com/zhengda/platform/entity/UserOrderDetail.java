@@ -155,5 +155,17 @@ public class UserOrderDetail {
         // 产品类型（主产品，副产品） 
             private String productionType;
 
+        // 产品规格 
+            private String productionSpec;
+
+        // 目的地 
+            private String destination;
+
+        // 目标重量 
+            private String targetWeight;
+
+        // 客户名字 
+            private String customerName;
+
 
 }

@@ -51,7 +51,11 @@
             waterelectronic waterelectronic,
             plant_code plantCode,
             process_order_no processOrderNo,
-            production_type productionType
+            production_type productionType,
+            production_spec productionSpec,
+            destination destination,
+            target_weight targetWeight,
+            customer_name customerName
 
     </sql>
     <!-- （条件） -->
@@ -204,6 +208,18 @@
                         <if test="productionType != null and productionType != ''">
                             and production_type= #{productionType,jdbcType=VARCHAR}
                         </if>
+                        <if test="productionSpec != null and productionSpec != ''">
+                            and production_spec= #{productionSpec,jdbcType=VARCHAR}
+                        </if>
+                        <if test="destination != null and destination != ''">
+                            and destination= #{destination,jdbcType=VARCHAR}
+                        </if>
+                        <if test="targetWeight != null and targetWeight != ''">
+                            and target_weight= #{targetWeight,jdbcType=VARCHAR}
+                        </if>
+                        <if test="customerName != null and customerName != ''">
+                            and customer_name= #{customerName,jdbcType=VARCHAR}
+                        </if>
         </where>
     </sql>
     <!-- （插入或更新） -->
@@ -350,6 +366,18 @@
                         <if test="productionType != null and productionType != ''">
                             production_type= #{productionType,jdbcType=VARCHAR},
                         </if>
+                        <if test="productionSpec != null and productionSpec != ''">
+                            production_spec= #{productionSpec,jdbcType=VARCHAR},
+                        </if>
+                        <if test="destination != null and destination != ''">
+                            destination= #{destination,jdbcType=VARCHAR},
+                        </if>
+                        <if test="targetWeight != null and targetWeight != ''">
+                            target_weight= #{targetWeight,jdbcType=VARCHAR},
+                        </if>
+                        <if test="customerName != null and customerName != ''">
+                            customer_name= #{customerName,jdbcType=VARCHAR},
+                        </if>
         </trim>
     </sql>
 
@@ -410,7 +438,11 @@
                     waterelectronic,
                     plant_code,
                     process_order_no,
-                    production_type
+                    production_type,
+                    production_spec,
+                    destination,
+                    target_weight,
+                    customer_name
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -463,6 +495,10 @@
                     #{item.plantCode,jdbcType=VARCHAR},
                     #{item.processOrderNo,jdbcType=VARCHAR},
                     #{item.productionType,jdbcType=VARCHAR},
+                    #{item.productionSpec,jdbcType=VARCHAR},
+                    #{item.destination,jdbcType=VARCHAR},
+                    #{item.targetWeight,jdbcType=VARCHAR},
+                    #{item.customerName,jdbcType=VARCHAR},
             </trim>
             )
         </foreach>
