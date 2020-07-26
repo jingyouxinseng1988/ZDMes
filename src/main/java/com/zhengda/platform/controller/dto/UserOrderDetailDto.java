@@ -145,5 +145,14 @@ public class UserOrderDetailDto {
     private Long scheduleStartDate;
     private Long scheduleEndDate;
 
+    private String productionSpec;
 
+    // 目的地
+    private String destination;
+
+    // 目标重量
+    private String targetWeight;
+
+    // 客户名字
+    private String customerName;
 }
