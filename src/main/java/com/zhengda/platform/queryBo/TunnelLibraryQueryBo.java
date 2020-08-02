@@ -78,4 +78,8 @@ public class TunnelLibraryQueryBo extends BaseQueryBo {
         public void setPlantCode(String plantCode) {
            put("plantCode", plantCode);
         }
+
+        public void setType(Integer type) {
+           put("type", type);
+        }
 }

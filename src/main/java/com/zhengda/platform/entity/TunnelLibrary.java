@@ -62,5 +62,8 @@ public class TunnelLibrary {
         // 工厂编码 
             private String plantCode;
 
+        // 1入库 2 出库 
+            private Integer type;
+
 
 }

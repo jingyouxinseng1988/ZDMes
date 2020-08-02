@@ -20,7 +20,8 @@
             create_time createTime,
             modify_time modifyTime,
             deleted deleted,
-            plant_code plantCode
+            plant_code plantCode,
+            type type
 
     </sql>
     <!-- （条件） -->
@@ -80,6 +81,9 @@
                         <if test="plantCode != null and plantCode != ''">
                             and plant_code= #{plantCode,jdbcType=VARCHAR}
                         </if>
+                        <if test="type != null">
+                            and type= #{type,jdbcType=INTEGER}
+                        </if>
         </where>
     </sql>
     <!-- （插入或更新） -->
@@ -133,6 +137,9 @@
                         <if test="plantCode != null and plantCode != ''">
                             plant_code= #{plantCode,jdbcType=VARCHAR},
                         </if>
+                        <if test="type != null">
+                            type= #{type,jdbcType=INTEGER},
+                        </if>
         </trim>
     </sql>
 
@@ -162,7 +169,8 @@
                     create_time,
                     modify_time,
                     deleted,
-                    plant_code
+                    plant_code,
+                    type
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -184,6 +192,7 @@
                     #{item.modifyTime,jdbcType=TIMESTAMP},
                     #{item.deleted,jdbcType=INTEGER},
                     #{item.plantCode,jdbcType=VARCHAR},
+                    #{item.type,jdbcType=INTEGER},
             </trim>
             )
         </foreach>

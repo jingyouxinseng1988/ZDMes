@@ -218,4 +218,8 @@ public class UserOrderDetailQueryBo extends BaseQueryBo {
         public void setCustomerName(String customerName) {
            put("customerName", customerName);
         }
+
+        public void setProductionName(String productionName) {
+           put("productionName", productionName);
+        }
 }

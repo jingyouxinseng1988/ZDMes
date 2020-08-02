@@ -167,5 +167,8 @@ public class UserOrderDetail {
         // 客户名字 
             private String customerName;
 
+        // 产品名称 
+            private String productionName;
+
 
 }

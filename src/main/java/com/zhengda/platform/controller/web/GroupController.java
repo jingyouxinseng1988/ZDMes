@@ -38,7 +38,7 @@ public class GroupController {
 
     @RequestMapping(value = "/add")
     @Transactional
-    public AjaxResult add( @Valid GroupDto groupDto) {
+    public AjaxResult add(@Valid GroupDto groupDto) {
         Group group = new Group();
         BeanUtils.copyProperties(groupDto, group);
         if (StringUtils.isEmpty(group.getGroupCode())) {
@@ -50,13 +50,13 @@ public class GroupController {
 
     @RequestMapping(value = "/delete")
     @Transactional
-    public AjaxResult delete( @Valid IdDto idDto) {
+    public AjaxResult delete(@Valid IdDto idDto) {
         groupService.deleteById(idDto.getId());
-        EmployeeGroupQueryBo employeeGroupQueryBo=new EmployeeGroupQueryBo();
+        EmployeeGroupQueryBo employeeGroupQueryBo = new EmployeeGroupQueryBo();
         employeeGroupQueryBo.setDeleted(Constants.DELETED_NO);
         employeeGroupQueryBo.setGroupId(idDto.getId());
         List<EmployeeGroup> list = employeeGroupService.getList(employeeGroupQueryBo);
-        for (EmployeeGroup eg:list){
+        for (EmployeeGroup eg : list) {
             employeeGroupService.deleteById(eg.getId());
         }
         return AjaxResult.success("");
@@ -64,46 +64,50 @@ public class GroupController {
 
     @RequestMapping(value = "/update")
     @Transactional
-    public AjaxResult update( @Valid UpdateGroupDto updateGroupDto) {
+    public AjaxResult update(@Valid UpdateGroupDto updateGroupDto) {
         Group group = groupService.getById(updateGroupDto.getId());
         group.setName(updateGroupDto.getName());
         group.setModifyTime(new Date());
         groupService.update(group);
         return AjaxResult.success("");
     }
+
     @RequestMapping(value = "/allocate_employee_group")
     @Transactional
-    public AjaxResult allocateEmployeeGroup( @Valid AllocateEmployeeGroupDto allocateEmployeeGroupDto) {
-        EmployeeGroupQueryBo groupQueryBo=new EmployeeGroupQueryBo();
+    public AjaxResult allocateEmployeeGroup(@Valid AllocateEmployeeGroupDto allocateEmployeeGroupDto) {
+        EmployeeGroupQueryBo groupQueryBo = new EmployeeGroupQueryBo();
         groupQueryBo.setGroupId(allocateEmployeeGroupDto.getGroupId());
         groupQueryBo.setEmployeeId(allocateEmployeeGroupDto.getEmployeeId());
         groupQueryBo.setDeleted(Constants.DELETED_NO);
+        groupQueryBo.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
         List<EmployeeGroup> list = employeeGroupService.getList(groupQueryBo);
-        if(allocateEmployeeGroupDto.getGroupId().equals(0L)&&!list.isEmpty()){
+        if (allocateEmployeeGroupDto.getGroupId().equals(0L) && !list.isEmpty()) {
             EmployeeGroup employeeGroup = list.get(0);
             employeeGroup.setDeleted(Constants.DELETED_YES);
             employeeGroupService.update(employeeGroup);
             return AjaxResult.success("");
         }
 
-        if(!list.isEmpty()){
+        if (!list.isEmpty()) {
             EmployeeGroup employeeGroup = list.get(0);
             employeeGroup.setEmployeeId(allocateEmployeeGroupDto.getEmployeeId());
             employeeGroup.setGroupId(allocateEmployeeGroupDto.getGroupId());
             employeeGroup.setModifyTime(new Date());
+            employeeGroup.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
             employeeGroupService.update(employeeGroup);
-        }else {
+        } else {
             EmployeeGroup employeeGroup = new EmployeeGroup();
             employeeGroup.setEmployeeId(allocateEmployeeGroupDto.getEmployeeId());
             employeeGroup.setGroupId(allocateEmployeeGroupDto.getGroupId());
             employeeGroup.setModifyTime(new Date());
+            employeeGroup.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
             employeeGroupService.add(employeeGroup);
         }
         return AjaxResult.success("");
     }
 
     @RequestMapping(value = "/list")
-    public AjaxResult list( @Valid PlantCodeDto plantCodeDto) {
+    public AjaxResult list(@Valid PlantCodeDto plantCodeDto) {
 /**
  * 组
  */
@@ -112,8 +116,8 @@ public class GroupController {
         groupQueryBo.setPlantCode(plantCodeDto.getPlantCode());
         List<Group> list = groupService.getList(groupQueryBo);
         Map<Long, List<Group>> collect = new HashMap<>();
-        if(!list.isEmpty()){
-            collect= list.stream().collect(Collectors.groupingBy(Group::getParentId));
+        if (!list.isEmpty()) {
+            collect = list.stream().collect(Collectors.groupingBy(Group::getParentId));
         }
 /**
  *  员工
@@ -122,11 +126,10 @@ public class GroupController {
         employeeQueryBo.setDeleted(Constants.DELETED_NO);
         employeeQueryBo.setPlantCode(plantCodeDto.getPlantCode());
         List<Employee> employeeList = employeeService.getList(employeeQueryBo);
-        Map<Long, Employee> idMapEmployee=new HashMap<>();
-        if(!employeeList.isEmpty()){
-            idMapEmployee= employeeList.stream().collect(Collectors.toMap(Employee::getId, x -> x));
+        Map<Long, Employee> idMapEmployee = new HashMap<>();
+        if (!employeeList.isEmpty()) {
+            idMapEmployee = employeeList.stream().collect(Collectors.toMap(Employee::getId, x -> x));
         }
-
 
 
         /**
@@ -158,7 +161,7 @@ public class GroupController {
          */
 
         List<Object> data = new ArrayList<>();
-        if(!collect.isEmpty()){
+        if (!collect.isEmpty()) {
             List<Group> groups = collect.get(0L);
             for (Group group : groups) {
                 ResGroupDto resGroupDto = new ResGroupDto();
@@ -176,7 +179,7 @@ public class GroupController {
         /**
          * 添加默认组
          */
-        List<Employee> defaultGroupEmployees= new ArrayList<>();
+        List<Employee> defaultGroupEmployees = new ArrayList<>();
         for (Map.Entry<Long, Employee> map : idMapEmployee.entrySet()) {
             defaultGroupEmployees.add(map.getValue());
         }

@@ -55,7 +55,8 @@
             production_spec productionSpec,
             destination destination,
             target_weight targetWeight,
-            customer_name customerName
+            customer_name customerName,
+            production_name productionName
 
     </sql>
     <!-- （条件） -->
@@ -220,6 +221,9 @@
                         <if test="customerName != null and customerName != ''">
                             and customer_name= #{customerName,jdbcType=VARCHAR}
                         </if>
+                        <if test="productionName != null and productionName != ''">
+                            and production_name= #{productionName,jdbcType=VARCHAR}
+                        </if>
         </where>
     </sql>
     <!-- （插入或更新） -->
@@ -378,6 +382,9 @@
                         <if test="customerName != null and customerName != ''">
                             customer_name= #{customerName,jdbcType=VARCHAR},
                         </if>
+                        <if test="productionName != null and productionName != ''">
+                            production_name= #{productionName,jdbcType=VARCHAR},
+                        </if>
         </trim>
     </sql>
 
@@ -442,7 +449,8 @@
                     production_spec,
                     destination,
                     target_weight,
-                    customer_name
+                    customer_name,
+                    production_name
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
@@ -499,6 +507,7 @@
                     #{item.destination,jdbcType=VARCHAR},
                     #{item.targetWeight,jdbcType=VARCHAR},
                     #{item.customerName,jdbcType=VARCHAR},
+                    #{item.productionName,jdbcType=VARCHAR},
             </trim>
             )
         </foreach>

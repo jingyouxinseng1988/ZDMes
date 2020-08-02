@@ -155,4 +155,9 @@ public class UserOrderDetailDto {
 
     // 客户名字
     private String customerName;
+    // 产品名称
+    private String productionName;
+
+    private java.math.BigDecimal finishedWeight;
+    private String personnelStation;
 }

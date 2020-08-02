@@ -86,7 +86,6 @@ public class OrderController {
             BeanUtils.copyProperties(userOrderDetail, userOrderDetailDto);
             userOrderDetailDto.setScheduleEndDate(userOrder != null && userOrder.getScheduleEndDate() == null ? 0 : userOrder.getScheduleEndDate().getTime());
             userOrderDetailDto.setScheduleStartDate(userOrder != null && userOrder.getScheduleStartDate() == null ? 0 : userOrder.getScheduleStartDate().getTime());
-
             data.add(userOrderDetailDto);
         }
         return AjaxResult.success(data);
@@ -138,7 +137,8 @@ public class OrderController {
             userOrderDetailDto.setEmployeeName(employee.getName());
             userOrderDetailDto.setScheduleEndDate(userOrder != null && userOrder.getScheduleEndDate() == null ? 0 : userOrder.getScheduleEndDate().getTime());
             userOrderDetailDto.setScheduleStartDate(userOrder != null && userOrder.getScheduleStartDate() == null ? 0 : userOrder.getScheduleStartDate().getTime());
-
+            userOrderDetailDto.setFinishedWeight(task.getFinishedWeight());
+            userOrderDetailDto.setPersonnelStation(task.getPersonnelStation());
             data.add(userOrderDetailDto);
 
         }
@@ -178,7 +178,7 @@ public class OrderController {
         UserOrder order = orderList.get(0);
         if (!list.isEmpty()) {
             Task task = list.get(0);
-            if (task.getFinshedWeight() != null && task.getFinshedWeight().compareTo(new BigDecimal(0)) == 1) {
+            if (task.getFinishedWeight() != null && task.getFinishedWeight().compareTo(new BigDecimal(0)) == 1) {
                 return AjaxResult.warn("订单已经开始，不能修改");
             }
             task.setEmployeeId(employee.getId());
