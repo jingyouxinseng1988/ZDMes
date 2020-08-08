@@ -79,5 +79,22 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
+    public Map<Long, Task> getMapByOrderDetailIdSet(List<Task> list) {
+        Map<Long, Task> map = new HashMap<>();
+        for (Task entity : list) {
+            map.put(entity.getOrderDetailId(), entity);
+        }
+        return map;
+    }
 
+    public List<Task> getListByOrderDetailIdSet(Set<Long> orderDetailIdSet) {
+        if (orderDetailIdSet.isEmpty()) {
+            return new ArrayList<>();
+        }
+        TaskQueryBo taskQueryBo = new TaskQueryBo();
+        taskQueryBo.setOrderDetailIdSet(orderDetailIdSet);
+        taskQueryBo.setDeleted(Constants.DELETED_NO);
+        return getList(taskQueryBo);
+
+    }
 }

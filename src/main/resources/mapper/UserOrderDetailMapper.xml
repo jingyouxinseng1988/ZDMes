@@ -554,4 +554,45 @@
         from user_order_detail
         <include refid="where"/>
     </select>
+    <select id="getListByUnallocated"
+            resultType="com.zhengda.platform.entity.UserOrderDetail">
+        <include refid="fields"/>
+        from user_order_detail
+        WHERE  deleted=0 and plant_code=#{plantCode} and process_order_no NOT IN (
+        SELECT t.`process_order_no`  FROM `task_employee` e, task t WHERE e.id=t.employee_id
+        )
+    </select>
+    <select id="getListByUnallocated2"
+            resultType="com.zhengda.platform.entity.UserOrderDetail">
+        <include refid="fields"/>
+        from user_order_detail
+        WHERE  deleted=0 and plant_code=#{plantCode} and process_order_no NOT IN (
+        SELECT t.`process_order_no`  FROM  task t WHERE t.deleted= 0 and t.employee_id>0
+        )
+        <if test="endTime != null">
+            and #{endTime}> create_time
+        </if>
+        <if test="startTime != null">
+            and  create_time>#{startTime}
+        </if>
+
+    </select>
+    <select id="getListByAllocated"
+            resultType="com.zhengda.platform.entity.UserOrderDetail">
+        <include refid="fields"/>
+        from user_order_detail
+        WHERE  deleted=0 and plant_code=#{plantCode} and process_order_no  IN (
+        SELECT t.`process_order_no`  FROM `task_employee` e, task t WHERE e.id=t.employee_id
+        )
+        order by id desc
+    </select>
+    <select id="getListByAllocated2"
+            resultType="com.zhengda.platform.entity.UserOrderDetail">
+        <include refid="fields"/>
+        from user_order_detail
+        WHERE  deleted=0 and plant_code=#{plantCode} and process_order_no  IN (
+        SELECT t.`process_order_no`  FROM task t WHERE t.deleted=0
+        )
+        order by id desc
+    </select>
 </mapper>

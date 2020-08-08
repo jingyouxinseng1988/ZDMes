@@ -194,4 +194,12 @@
         from employee
         <include refid="where"/>
     </select>
+    <select id="getListByTaskId"
+            resultType="com.zhengda.platform.entity.Employee">
+        <include refid="fields"/>
+        from employee
+        WHERE id IN (SELECT employee_id FROM `task_employee` WHERE task_id=#{taskId} ) AND deleted=0
+    </select>
+
+
 </mapper>
