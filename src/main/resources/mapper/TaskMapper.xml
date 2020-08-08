@@ -5,6 +5,7 @@
     <sql id="fields">
         select
             id id,
+            destination,
             process_order_no processOrderNo,
             production_time productionTime,
             process_order_type processOrderType,
@@ -230,6 +231,7 @@
         deleted,
         order_detail_id,
         status,
+        destination,
         personnel_station
         )
         VALUES
@@ -258,6 +260,7 @@
                 #{item.deleted,jdbcType=INTEGER},
                 #{item.orderDetailId,jdbcType=BIGINT},
                 #{item.status,jdbcType=INTEGER},
+                #{item.destination,jdbcType=VARCHAR},
                 #{item.personnelStation,jdbcType=VARCHAR},
             </trim>
             )

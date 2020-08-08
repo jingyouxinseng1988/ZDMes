@@ -83,5 +83,7 @@ public class Task {
         // 人员工位 
             private String personnelStation;
 
+            private String destination;
+
 
 }
