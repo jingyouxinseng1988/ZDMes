@@ -45,7 +45,7 @@ public class HtmlController {
 
     @RequestMapping("/employee_upload")
     @ResponseBody
-    public String employee(@RequestParam("employeeUpload") MultipartFile file) {
+    public String employee(@RequestParam("file") MultipartFile file) {
 
         // 这里默认读取第一个sheet
         try {

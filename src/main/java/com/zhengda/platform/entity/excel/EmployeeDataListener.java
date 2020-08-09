@@ -66,7 +66,7 @@ public class EmployeeDataListener extends AnalysisEventListener<EmployeeExcelDto
                     group.setName(data.getGroupName());
                     group.setParentId(0L);
                     group.setPlantCode(data.getPlantCode());
-                    group.setPlantCode(UUID.randomUUID().toString().replace("-", ""));
+                    group.setGroupCode(UUID.randomUUID().toString().replace("-", ""));
                     groupService.add(group);
                 }
                 groupNameMap.put(group.getName(), group);
@@ -101,6 +101,7 @@ public class EmployeeDataListener extends AnalysisEventListener<EmployeeExcelDto
                         card.setEmployeeNo(employee.getEmployeeNo());
                         card.setEmployeeId(employee.getId());
                         card.setCardCode(cardCode);
+                        card.setPlantCode(data.getPlantCode());
                         cardService.add(card);
                     }
                 }
