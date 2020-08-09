@@ -5,7 +5,6 @@
     <sql id="fields">
         select
             id id,
-            role,
             name name,
             sex sex,
             identity_card identityCard,
@@ -16,7 +15,12 @@
             end_time endTime,
             employee_no employeeNo,
             plant_code plantCode,
-            password password
+            password password,
+            role role,
+            status status,
+            address address,
+            contract_start_time contractStartTime,
+            contract_end_time contractEndTime
 
     </sql>
     <!-- （条件） -->
@@ -31,8 +35,8 @@
             <if test="name != null and name != ''">
                 and name= #{name,jdbcType=VARCHAR}
             </if>
-            <if test="sex != null">
-                and sex= #{sex,jdbcType=INTEGER}
+            <if test="sex != null and sex != ''">
+                and sex= #{sex,jdbcType=VARCHAR}
             </if>
             <if test="identityCard != null and identityCard != ''">
                 and identity_card= #{identityCard,jdbcType=VARCHAR}
@@ -49,9 +53,6 @@
             <if test="deleted != null">
                 and deleted= #{deleted,jdbcType=INTEGER}
             </if>
-            <if test="role != null">
-                and role= #{role,jdbcType=INTEGER}
-            </if>
             <if test="endTime != null">
                 and end_time= #{endTime,jdbcType=TIMESTAMP}
             </if>
@@ -64,6 +65,21 @@
             <if test="password != null and password != ''">
                 and password= #{password,jdbcType=VARCHAR}
             </if>
+            <if test="role != null">
+                and role= #{role,jdbcType=INTEGER}
+            </if>
+            <if test="status != null and status != ''">
+                and status= #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="address != null and address != ''">
+                and address= #{address,jdbcType=VARCHAR}
+            </if>
+            <if test="contractStartTime != null">
+                and contract_start_time= #{contractStartTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="contractEndTime != null">
+                and contract_end_time= #{contractEndTime,jdbcType=TIMESTAMP}
+            </if>
         </where>
     </sql>
     <!-- （插入或更新） -->
@@ -72,8 +88,8 @@
             <if test="name != null and name != ''">
                 name= #{name,jdbcType=VARCHAR},
             </if>
-            <if test="sex != null">
-                sex= #{sex,jdbcType=INTEGER},
+            <if test="sex != null and sex != ''">
+                sex= #{sex,jdbcType=VARCHAR},
             </if>
             <if test="identityCard != null and identityCard != ''">
                 identity_card= #{identityCard,jdbcType=VARCHAR},
@@ -90,9 +106,6 @@
             <if test="deleted != null">
                 deleted= #{deleted,jdbcType=INTEGER},
             </if>
-            <if test="role != null">
-                role= #{role,jdbcType=INTEGER},
-            </if>
             <if test="endTime != null">
                 end_time= #{endTime,jdbcType=TIMESTAMP},
             </if>
@@ -104,6 +117,21 @@
             </if>
             <if test="password != null and password != ''">
                 password= #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="role != null">
+                role= #{role,jdbcType=INTEGER},
+            </if>
+            <if test="status != null and status != ''">
+                status= #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null and address != ''">
+                address= #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="contractStartTime != null">
+                contract_start_time= #{contractStartTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="contractEndTime != null">
+                contract_end_time= #{contractEndTime,jdbcType=TIMESTAMP},
             </if>
         </trim>
     </sql>
@@ -126,28 +154,36 @@
         create_time,
         modify_time,
         deleted,
-        role,
         end_time,
         employee_no,
         plant_code,
-        password
+        password,
+        role,
+        status,
+        address,
+        contract_start_time,
+        contract_end_time
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (
             <trim prefix="" suffixOverrides=",">
                 #{item.name,jdbcType=VARCHAR},
-                #{item.sex,jdbcType=INTEGER},
+                #{item.sex,jdbcType=VARCHAR},
                 #{item.identityCard,jdbcType=VARCHAR},
                 #{item.phone,jdbcType=VARCHAR},
                 #{item.createTime,jdbcType=TIMESTAMP},
                 #{item.modifyTime,jdbcType=TIMESTAMP},
                 #{item.deleted,jdbcType=INTEGER},
-                #{item.role,jdbcType=INTEGER},
                 #{item.endTime,jdbcType=TIMESTAMP},
                 #{item.employeeNo,jdbcType=VARCHAR},
                 #{item.plantCode,jdbcType=VARCHAR},
                 #{item.password,jdbcType=VARCHAR},
+                #{item.role,jdbcType=INTEGER},
+                #{item.status,jdbcType=VARCHAR},
+                #{item.address,jdbcType=VARCHAR},
+                #{item.contractStartTime,jdbcType=TIMESTAMP},
+                #{item.contractEndTime,jdbcType=TIMESTAMP},
             </trim>
             )
         </foreach>
@@ -167,6 +203,10 @@
         where id = #{id}
     </update>
 
+
+    <delete id="deletePhysicalById">
+        delete from  employee where id = #{id}
+    </delete>
     <!-- 查询单个 -->
     <select id="getById" resultType="com.zhengda.platform.entity.Employee">
         <include refid="fields"/>
@@ -180,7 +220,7 @@
         from employee
         <include refid="where"/>
         <if test="column != null">
-            order by ${column} ${sort}
+            order by ${column}  ${sort}
         </if>
         <if test="offset != null">
             limit #{offset} , ${limit}

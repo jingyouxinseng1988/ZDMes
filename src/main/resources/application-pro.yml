@@ -1,6 +1,8 @@
 server:
   port: 8285
 spring:
+  thymeleaf:
+    cache: false
 #  redis:
 #    host: 47.96.110.70
 #    port: 6379

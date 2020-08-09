@@ -7,6 +7,7 @@ import com.zhengda.platform.queryBo.BaseQueryBo;
 import com.zhengda.platform.queryBo.EmployeeQueryBo;
 import com.zhengda.platform.service.EmployeeService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -82,5 +83,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> getListByTaskId(Long taskId) {
         return employeeDao.getListByTaskId(taskId);
+    }
+
+    public Employee getByEmployeeNo(String employeeNo, String plantCode) {
+        if (StringUtils.isEmpty(employeeNo)) {
+            return null;
+        }
+        EmployeeQueryBo employeeQueryBo = new EmployeeQueryBo();
+        employeeQueryBo.setPlantCode(plantCode);
+        employeeQueryBo.setEmployeeNo(employeeNo);
+        employeeQueryBo.setDeleted(Constants.DELETED_NO);
+        List<Employee> list = this.getList(employeeQueryBo);
+        return list.isEmpty() ? null : list.get(0);
     }
 }

@@ -160,4 +160,5 @@ public class UserOrderDetailDto {
 
     private java.math.BigDecimal finishedWeight;
     private String personnelStation;
+    private Integer status;
 }

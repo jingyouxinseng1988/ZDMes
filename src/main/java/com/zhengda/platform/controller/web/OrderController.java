@@ -9,13 +9,13 @@ import com.zhengda.platform.entity.Employee;
 import com.zhengda.platform.entity.Task;
 import com.zhengda.platform.entity.UserOrder;
 import com.zhengda.platform.entity.UserOrderDetail;
-import com.zhengda.platform.entity.ext.TaskEmployeeExt;
 import com.zhengda.platform.queryBo.TaskQueryBo;
 import com.zhengda.platform.queryBo.UserOrderQueryBo;
 import com.zhengda.platform.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -91,7 +91,7 @@ public class OrderController {
         Set<Long> employeeIdSet = new HashSet<>();
         for (Task task : taskList) {
             orderDetailIdMap.put(task.getOrderDetailId(), task);
-            employeeIdSet.add(task.getId());
+            employeeIdSet.add(task.getEmployeeId());
         }
 
         Map<Long, Employee> employeeMap = employeeService.getMapByIds(employeeIdSet);
@@ -110,8 +110,9 @@ public class OrderController {
             userOrderDetailDto.setFinishedWeight(task.getFinishedWeight());
             userOrderDetailDto.setPersonnelStation(task.getPersonnelStation());
             Employee employee = employeeMap.get(task.getEmployeeId());
-            userOrderDetailDto.setId(employee == null ? 0L : employee.getId());
+            userOrderDetailDto.setEmployeeId(employee == null ? 0L : employee.getId());
             userOrderDetailDto.setEmployeeName(employee == null ? "" : employee.getName());
+            userOrderDetailDto.setStatus(task.getStatus());
             data.add(userOrderDetailDto);
 
         }
@@ -188,9 +189,48 @@ public class OrderController {
 
     @RequestMapping(value = "/update_status")
     @Transactional
-    public AjaxResult list(Long taskId, Integer status) {
-        Task task = taskService.getById(taskId);
+    public AjaxResult list(Long id, Integer status) {
+        UserOrderDetail userOrderDetail = userOrderDetailService.getById(id);
+        if (userOrderDetail == null) {
+            return AjaxResult.warn("没有找到订单详情");
+        }
+        TaskQueryBo taskQueryBo = new TaskQueryBo();
+        taskQueryBo.setOrderDetailId(userOrderDetail.getId());
+        taskQueryBo.setDeleted(Constants.DELETED_NO);
+        List<Task> list = taskService.getList(taskQueryBo);
+        if (list.isEmpty()) {
+            return AjaxResult.warn("没有找到该任务");
+        }
+        Task task = list.get(0);
         task.setStatus(status);
+        taskService.update(task);
+        return AjaxResult.success("");
+    }
+
+    @RequestMapping(value = "/update_task")
+    @Transactional
+    public AjaxResult list(Long id, String destination, BigDecimal finishedWeight) {
+        UserOrderDetail userOrderDetail = userOrderDetailService.getById(id);
+        if (userOrderDetail == null) {
+            return AjaxResult.warn("没有找到订单详情");
+        }
+        userOrderDetail.setDestination(destination);
+        userOrderDetailService.update(userOrderDetail);
+
+        TaskQueryBo taskQueryBo = new TaskQueryBo();
+        taskQueryBo.setOrderDetailId(userOrderDetail.getId());
+        taskQueryBo.setDeleted(Constants.DELETED_NO);
+        List<Task> list = taskService.getList(taskQueryBo);
+        if (list.isEmpty()) {
+            return AjaxResult.warn("没有找到该任务");
+        }
+        Task task = list.get(0);
+        if (!StringUtils.isEmpty(destination)) {
+            task.setDestination(destination);
+        }
+        if (finishedWeight != null) {
+            task.setFinishedWeight(finishedWeight);
+        }
         taskService.update(task);
         return AjaxResult.success("");
     }

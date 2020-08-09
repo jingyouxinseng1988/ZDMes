@@ -59,6 +59,64 @@
             production_name productionName
 
     </sql>
+
+    <sql id="fieldNew">
+        select
+            ord.id id,
+            ord.order_id orderId,
+            ord.shift shift,
+            ord.material_code materialCode,
+            ord.material_desc materialDesc,
+            ord.material_group materialGroup,
+            ord.old_material_code oldMaterialCode,
+            ord.production_no productionNo,
+            ord.production_unit productionUnit,
+            ord.production_qty productionQty,
+            ord.read_status readStatus,
+            ord.update_time updateTime,
+            ord.zverid zverid,
+            ord.line_no lineNo,
+            ord.line_name lineName,
+            ord.create_time createTime,
+            ord.modify_time modifyTime,
+            ord.deleted deleted,
+            ord.flag flag,
+            ord.operationphase operationphase,
+            ord.operationphase_name operationphaseName,
+            ord.confirmation_no confirmationNo,
+            ord.machine machine,
+            ord.number_of_employees numberOfEmployees,
+            ord.operation_qty operationQty,
+            ord.operation_unit operationUnit,
+            ord.base_qty baseQty,
+            ord.denominator_qty denominatorQty,
+            ord.numerator_qty numeratorQty,
+            ord.labor_time laborTime,
+            ord.labor_unit laborUnit,
+            ord.machine_time machineTime,
+            ord.machine_unit machineUnit,
+            ord.item_no itemNo,
+            ord.component_code componentCode,
+            ord.component_desc componentDesc,
+            ord.component_qty componentQty,
+            ord.component_unit componentUnit,
+            prodstor_location prodstorLocation,
+            ord.cost_operationphase costOperationphase,
+            ord.ctr_code ctrCode,
+            ord.receiving_flag receivingFlag,
+            ord.stage_flag stageFlag,
+            ord.replace_flag replaceFlag,
+            ord.waterelectronic waterelectronic,
+            ord.plant_code plantCode,
+            ord.process_order_no processOrderNo,
+            ord.production_type productionType,
+            ord.production_spec productionSpec,
+            ord.destination destination,
+            ord.target_weight targetWeight,
+            ord.customer_name customerName,
+            ord.production_name productionName
+
+    </sql>
     <!-- （条件） -->
     <sql id="where">
         <where>
@@ -564,16 +622,16 @@
     </select>
     <select id="getListByUnallocated2"
             resultType="com.zhengda.platform.entity.UserOrderDetail">
-        <include refid="fields"/>
-        from user_order_detail
-        WHERE  deleted=0 and plant_code=#{plantCode} and process_order_no NOT IN (
+        <include refid="fieldNew"/>
+        from user_order_detail ord , user_order  uo
+        WHERE uo.id=ord.order_id and  ord.deleted=0 and ord.plant_code=#{plantCode} and ord.process_order_no NOT IN (
         SELECT t.`process_order_no`  FROM  task t WHERE t.deleted= 0 and t.employee_id>0
         )
         <if test="endTime != null">
-            and #{endTime}> create_time
+            and #{endTime}> uo.schedule_start_date
         </if>
         <if test="startTime != null">
-            and  create_time>#{startTime}
+            and  uo.schedule_start_date>#{startTime}
         </if>
 
     </select>

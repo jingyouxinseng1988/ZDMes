@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhengda.platform.dao.FridUuidDao">
+    <!-- 查询字段 -->
+    <sql id="fields">
+        select
+            id id,
+            frid frid,
+            uuid uuid
+
+    </sql>
+    <!-- （条件） -->
+    <sql id="where">
+        <where>
+            <if test="ids != null and  ids.size > 0">
+                and id in
+                <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="uuidSet != null and  uuidSet.size > 0">
+                and uuid in
+                <foreach collection="uuidSet" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="frid != null and frid != ''">
+                and frid= #{frid,jdbcType=VARCHAR}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                and uuid= #{uuid,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </sql>
+    <!-- （插入或更新） -->
+    <sql id="saveSet">
+        <trim prefix="" suffixOverrides=",">
+            <if test="frid != null and frid != ''">
+                frid= #{frid,jdbcType=VARCHAR},
+            </if>
+            <if test="uuid != null and uuid != ''">
+                uuid= #{uuid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </sql>
+
+    <!-- 插入实体 -->
+    <insert id="insert" parameterType="com.zhengda.platform.entity.FridUuid" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into frid_uuid set
+        <include refid="saveSet"/>
+    </insert>
+    <!-- 批量插入实体 -->
+    <insert id="insertList" parameterType="java.util.List" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into frid_uuid
+        (
+        frid,
+        uuid
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            <trim prefix="" suffixOverrides=",">
+                #{item.frid,jdbcType=VARCHAR},
+                #{item.uuid,jdbcType=VARCHAR},
+            </trim>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 更新实体 -->
+    <update id="update" parameterType="com.zhengda.platform.entity.FridUuid">
+        update frid_uuid set
+        <include refid="saveSet"/>
+        where id = #{id}
+    </update>
+    <update id="deleteById">
+        update frid_uuid
+        <set>
+            deleted=1
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <delete id="deletePhysicalById">
+        delete from  frid_uuid where id = #{id}
+    </delete>
+    <!-- 查询单个 -->
+    <select id="getById" resultType="com.zhengda.platform.entity.FridUuid">
+        <include refid="fields"/>
+        from frid_uuid
+        where id = #{id}
+    </select>
+    <!-- 查询 -->
+    <select id="getList"
+            resultType="com.zhengda.platform.entity.FridUuid">
+        <include refid="fields"/>
+        from frid_uuid
+        <include refid="where"/>
+        <if test="column != null">
+            order by ${column} ${sort}
+        </if>
+        <if test="offset != null">
+            limit #{offset} , ${limit}
+        </if>
+    </select>
+
+
+    <!-- 查询（计数） -->
+    <select id="getCount" resultType="java.lang.Long">
+        select count(*)
+        from frid_uuid
+        <include refid="where"/>
+    </select>
+</mapper>
