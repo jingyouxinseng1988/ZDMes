@@ -96,4 +96,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> list = this.getList(employeeQueryBo);
         return list.isEmpty() ? null : list.get(0);
     }
+    public Employee getByPhone(String phone, String plantCode) {
+        if (StringUtils.isEmpty(phone)) {
+            return null;
+        }
+        EmployeeQueryBo employeeQueryBo = new EmployeeQueryBo();
+        employeeQueryBo.setPlantCode(plantCode);
+        employeeQueryBo.setPhone(phone);
+        employeeQueryBo.setDeleted(Constants.DELETED_NO);
+        List<Employee> list = this.getList(employeeQueryBo);
+        return list.isEmpty() ? null : list.get(0);
+    }
 }

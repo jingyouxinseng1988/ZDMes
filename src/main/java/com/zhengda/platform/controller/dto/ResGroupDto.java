@@ -17,5 +17,7 @@ public class ResGroupDto {
 
     private List<EmployeeDto> employeeList;
 
+    private List<ResGroupDto> subGroup;
+
 
 }

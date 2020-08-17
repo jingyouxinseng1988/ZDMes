@@ -7,6 +7,7 @@ import com.zhengda.platform.entity.TunnelLibrary;
 import com.zhengda.platform.enums.TunnelLibraryType;
 import com.zhengda.platform.queryBo.TunnelLibraryQueryBo;
 import com.zhengda.platform.service.TunnelLibraryService;
+import com.zhengda.platform.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +30,14 @@ public class TunnelLibController {
 
     @RequestMapping(value = "/list")
     public AjaxResult allocatedList(@Valid PlantCodeDto plantCodeDto) {
+        Date startTimeByDay = plantCodeDto.getStartTime() == null ? null : DateUtils.getStartTimeByDay(new Date(plantCodeDto.getStartTime()));
+        Date endTimeByDay = plantCodeDto.getEndTime() == null ? null : DateUtils.getEndTimeByDay(new Date(plantCodeDto.getEndTime()));
         TunnelLibraryQueryBo tunnelLibraryQueryBo = new TunnelLibraryQueryBo();
         tunnelLibraryQueryBo.setDeleted(Constants.DELETED_NO);
         tunnelLibraryQueryBo.setPlantCode(plantCodeDto.getPlantCode());
+        tunnelLibraryQueryBo.setType(plantCodeDto.getType());
+        tunnelLibraryQueryBo.setStartTime(startTimeByDay);
+        tunnelLibraryQueryBo.setEnterTime(endTimeByDay);
         List<TunnelLibrary> list = tunnelLibraryService.getList(tunnelLibraryQueryBo);
         return AjaxResult.success(list);
     }
@@ -54,9 +61,9 @@ public class TunnelLibController {
                 out = out.add(tl.getWeight());
             }
         }
-        Map map=new HashMap<>();
-        map.put("enter",enter);
-        map.put("out",out);
+        Map map = new HashMap<>();
+        map.put("enter", enter);
+        map.put("out", out);
         return AjaxResult.success(map);
     }
 

@@ -52,6 +52,13 @@
                     #{item}
                 </foreach>
             </if>
+            <if test="employeeIdSet != null and  employeeIdSet.size > 0">
+                and employee_id in
+                <foreach collection="employeeIdSet" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
             <if test="processOrderNo != null and processOrderNo != ''">
                 and process_order_no= #{processOrderNo,jdbcType=VARCHAR}
             </if>
@@ -164,6 +171,9 @@
             </if>
             <if test="employeeCode != null and employeeCode != ''">
                 employee_code= #{employeeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="destination != null and destination != ''">
+                destination= #{destination,jdbcType=VARCHAR},
             </if>
             <if test="employeeId != null">
                 employee_id= #{employeeId,jdbcType=BIGINT},

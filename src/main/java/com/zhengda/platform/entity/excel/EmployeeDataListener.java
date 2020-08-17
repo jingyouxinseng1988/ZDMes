@@ -55,16 +55,35 @@ public class EmployeeDataListener extends AnalysisEventListener<EmployeeExcelDto
         EmployeeGroupService employeeGroupService = SpringUtil.getApplicationContext().getBean(EmployeeGroupService.class);
         CardService cardService = SpringUtil.getApplicationContext().getBean(CardService.class);
         for (EmployeeExcelDto data : list) {
-            if (StringUtils.isEmpty(data.getGroupName()) || StringUtils.isEmpty(data.getPlantCode())) {
+            if (StringUtils.isEmpty(data.getParentGroupName()) ||
+                    StringUtils.isEmpty(data.getGroupName()) ||
+                    StringUtils.isEmpty(data.getPlantCode()) ||
+                    StringUtils.isEmpty(data.getEmployeeNo()) ||
+                    StringUtils.isEmpty(data.getPhone())) {
                 continue;
             }
+            Group parentGroup = groupNameMap.get(data.getParentGroupName());
+            if (parentGroup == null) {
+                parentGroup = groupService.getByName(data.getGroupName(), data.getPlantCode());
+                if (parentGroup == null) {
+                    parentGroup = new Group();
+                    parentGroup.setName(data.getParentGroupName());
+                    parentGroup.setParentId(0L);
+                    parentGroup.setPlantCode(data.getPlantCode());
+                    parentGroup.setGroupCode(UUID.randomUUID().toString().replace("-", ""));
+                    groupService.add(parentGroup);
+                }
+                groupNameMap.put(parentGroup.getName(), parentGroup);
+            }
+
+
             Group group = groupNameMap.get(data.getGroupName());
             if (group == null) {
                 group = groupService.getByName(data.getGroupName(), data.getPlantCode());
                 if (group == null) {
                     group = new Group();
                     group.setName(data.getGroupName());
-                    group.setParentId(0L);
+                    group.setParentId(parentGroup.getId());
                     group.setPlantCode(data.getPlantCode());
                     group.setGroupCode(UUID.randomUUID().toString().replace("-", ""));
                     groupService.add(group);
@@ -73,11 +92,15 @@ public class EmployeeDataListener extends AnalysisEventListener<EmployeeExcelDto
             }
 
             Employee employee = employeeService.getByEmployeeNo(data.getEmployeeNo(), data.getPlantCode());
-            if (employee == null) {
+            Employee employeePhone = employeeService.getByPhone(data.getPhone(), data.getPlantCode());
+            if (employee == null && employeePhone == null) {
                 employee = new Employee();
                 SpringUtil.copyNotNullProperties(data, employee);
                 employeeService.add(employee);
             } else {
+                if (employeePhone != null) {
+                    employee = employeePhone;
+                }
                 SpringUtil.copyNotNullProperties(data, employee);
                 employeeService.update(employee);
             }
@@ -97,7 +120,7 @@ public class EmployeeDataListener extends AnalysisEventListener<EmployeeExcelDto
                 for (String cardCode : split) {
                     Card card = cardService.getByCardCode(data.getPlantCode(), cardCode, employee.getId());
                     if (card == null) {
-                        card=new Card();
+                        card = new Card();
                         card.setEmployeeNo(employee.getEmployeeNo());
                         card.setEmployeeId(employee.getId());
                         card.setCardCode(cardCode);

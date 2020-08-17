@@ -635,6 +635,21 @@
         </if>
 
     </select>
+    <select id="getListByTime"
+            resultType="com.zhengda.platform.entity.UserOrderDetail">
+        <include refid="fieldNew"/>
+        from user_order_detail ord , user_order  uo
+        WHERE uo.id=ord.order_id and  ord.deleted=0 and ord.plant_code=#{plantCode}
+        <if test="endTime != null">
+            and #{endTime}> uo.schedule_start_date
+        </if>
+        <if test="startTime != null">
+            and  uo.schedule_start_date>#{startTime}
+        </if>
+
+    </select>
+
+
     <select id="getListByAllocated"
             resultType="com.zhengda.platform.entity.UserOrderDetail">
         <include refid="fields"/>
@@ -650,6 +665,13 @@
         from user_order_detail
         WHERE  deleted=0 and plant_code=#{plantCode} and process_order_no  IN (
         SELECT t.`process_order_no`  FROM task t WHERE t.deleted=0
+
+        <if test="statusSet != null and  statusSet.size > 0">
+            and status in
+            <foreach collection="statusSet" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         )
         order by id desc
     </select>

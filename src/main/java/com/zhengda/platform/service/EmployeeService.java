@@ -13,4 +13,6 @@ public interface EmployeeService extends BaseService<Employee> {
 
     Employee getByEmployeeNo(String employeeNo, String plantCode);
 
+    Employee getByPhone(String phone, String plantCode);
+
 }

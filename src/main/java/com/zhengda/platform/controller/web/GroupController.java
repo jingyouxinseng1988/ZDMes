@@ -75,6 +75,11 @@ public class GroupController {
     @RequestMapping(value = "/allocate_employee_group")
     @Transactional
     public AjaxResult allocateEmployeeGroup(@Valid AllocateEmployeeGroupDto allocateEmployeeGroupDto) {
+
+        Group group = groupService.getById(allocateEmployeeGroupDto.getGroupId());
+        if (group.getParentId().equals(0L)) {
+            return AjaxResult.warn("该组不能分配人员");
+        }
         EmployeeGroupQueryBo groupQueryBo = new EmployeeGroupQueryBo();
         groupQueryBo.setGroupId(allocateEmployeeGroupDto.getGroupId());
         groupQueryBo.setEmployeeId(allocateEmployeeGroupDto.getEmployeeId());
@@ -115,9 +120,9 @@ public class GroupController {
         groupQueryBo.setDeleted(Constants.DELETED_NO);
         groupQueryBo.setPlantCode(plantCodeDto.getPlantCode());
         List<Group> list = groupService.getList(groupQueryBo);
-        Map<Long, List<Group>> collect = new HashMap<>();
+        Map<Long, List<Group>> parentIdMapGroup = new HashMap<>();
         if (!list.isEmpty()) {
-            collect = list.stream().collect(Collectors.groupingBy(Group::getParentId));
+            parentIdMapGroup = list.stream().collect(Collectors.groupingBy(Group::getParentId));
         }
 /**
  *  员工
@@ -161,19 +166,34 @@ public class GroupController {
          */
 
         List<Object> data = new ArrayList<>();
-        if (!collect.isEmpty()) {
-            List<Group> groups = collect.get(0L);
+        if (!parentIdMapGroup.isEmpty()) {
+            List<Group> groups = parentIdMapGroup.get(0L);
             for (Group group : groups) {
                 ResGroupDto resGroupDto = new ResGroupDto();
                 data.add(resGroupDto);
                 BeanUtils.copyProperties(group, resGroupDto);
                 resGroupDto.setEmployeeList(new ArrayList<>());
-                List<Employee> employees = groupIdMapEmployees.get(group.getId());
-                if (employees == null) {
-                    continue;
+                resGroupDto.setSubGroup(new ArrayList<>());
+                List<Group> subList = parentIdMapGroup.get(group.getId());
+
+                if (subList != null) {
+                    for (Group subGroup : subList) {
+                        ResGroupDto subGroupDto = new ResGroupDto();
+                        resGroupDto.getSubGroup().add(subGroupDto);
+                        BeanUtils.copyProperties(subGroup, subGroupDto);
+                        subGroupDto.setEmployeeList(new ArrayList<>());
+                        List<Employee> employees = groupIdMapEmployees.get(subGroup.getId());
+                        if (employees == null) {
+                            continue;
+                        }
+                        List<EmployeeDto> employeeDtos = SpringUtil.copyListProperty(employees, EmployeeDto.class);
+                        subGroupDto.setEmployeeList(employeeDtos);
+
+
+                    }
                 }
-                List<EmployeeDto> employeeDtos = SpringUtil.copyListProperty(employees, EmployeeDto.class);
-                resGroupDto.setEmployeeList(employeeDtos);
+
+
             }
         }
         /**
@@ -190,6 +210,7 @@ public class GroupController {
         defaultGroup.setName("default");
         defaultGroup.setParentId(0L);
         defaultGroup.setPlantCode(plantCodeDto.getPlantCode());
+        defaultGroup.setSubGroup(new ArrayList<>());
         defaultGroup.setEmployeeList(SpringUtil.copyListProperty(defaultGroupEmployees, EmployeeDto.class));
         data.add(defaultGroup);
         return AjaxResult.success(data);

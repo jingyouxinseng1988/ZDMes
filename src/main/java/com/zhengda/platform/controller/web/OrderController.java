@@ -11,7 +11,10 @@ import com.zhengda.platform.entity.UserOrder;
 import com.zhengda.platform.entity.UserOrderDetail;
 import com.zhengda.platform.queryBo.TaskQueryBo;
 import com.zhengda.platform.queryBo.UserOrderQueryBo;
-import com.zhengda.platform.service.*;
+import com.zhengda.platform.service.EmployeeService;
+import com.zhengda.platform.service.TaskService;
+import com.zhengda.platform.service.UserOrderDetailService;
+import com.zhengda.platform.service.UserOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,8 +40,31 @@ public class OrderController {
     private TaskService taskService;
     @Resource
     private EmployeeService employeeService;
-    @Resource
-    private TaskEmployeeService taskEmployeeService;
+
+    @RequestMapping(value = "/detail/list")
+    public AjaxResult getListByTime(@Valid PlantCodeDto plantCodeDto, Long startTime, Long endTime) {
+
+        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByTime(plantCodeDto.getPlantCode(), startTime, endTime);
+
+
+        UserOrderQueryBo userOrderQueryBo = new UserOrderQueryBo();
+        userOrderQueryBo.setDeleted(Constants.DELETED_NO);
+        userOrderQueryBo.setPlantCode(plantCodeDto.getPlantCode());
+        List<UserOrder> userOrderList = userOrderService.getList(userOrderQueryBo);
+        Map<String, UserOrder> noMapOrder = userOrderList.stream().collect(Collectors.toMap(UserOrder::getProcessOrderNo, X -> X));
+
+
+        List<Object> data = new ArrayList<>();
+        for (UserOrderDetail userOrderDetail : userOrderDetailList) {
+            UserOrder userOrder = noMapOrder.get(userOrderDetail.getProcessOrderNo());
+            UserOrderDetailDto userOrderDetailDto = new UserOrderDetailDto();
+            BeanUtils.copyProperties(userOrderDetail, userOrderDetailDto);
+            userOrderDetailDto.setScheduleEndDate(userOrder != null && userOrder.getScheduleEndDate() == null ? 0 : userOrder.getScheduleEndDate().getTime());
+            userOrderDetailDto.setScheduleStartDate(userOrder != null && userOrder.getScheduleStartDate() == null ? 0 : userOrder.getScheduleStartDate().getTime());
+            data.add(userOrderDetailDto);
+        }
+        return AjaxResult.success(data);
+    }
 
     @RequestMapping(value = "/unallocated_list")
     public AjaxResult allocatedList(@Valid PlantCodeDto plantCodeDto, Long startTime, Long endTime) {
@@ -70,7 +96,18 @@ public class OrderController {
         /**
          * 已经分配的订单详情
          */
-        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByAllocated(plantCodeDto.getPlantCode());
+
+        Set<Integer> statusSet = new HashSet<>();
+        if (plantCodeDto.getStatus() != null) {
+            statusSet.add(plantCodeDto.getStatus());
+            if (plantCodeDto.getStatus().equals(3) || plantCodeDto.getStatus().equals(2)) {
+                statusSet.add(2);
+                statusSet.add(3);
+            }
+
+        }
+
+        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByAllocated(plantCodeDto.getPlantCode(), statusSet);
 
         /**
          * 订单列表
@@ -113,37 +150,17 @@ public class OrderController {
             userOrderDetailDto.setEmployeeId(employee == null ? 0L : employee.getId());
             userOrderDetailDto.setEmployeeName(employee == null ? "" : employee.getName());
             userOrderDetailDto.setStatus(task.getStatus());
+            userOrderDetailDto.setTaskId(task.getId());
             data.add(userOrderDetailDto);
 
         }
         return AjaxResult.success(data);
     }
-//
-//    private String getEmployeeNames(List<TaskEmployeeExt> taskEmployeeExts) {
-//
-//        StringBuffer sb = new StringBuffer();
-//        for (TaskEmployeeExt taskEmployeeExt : taskEmployeeExts) {
-//            sb.append(taskEmployeeExt.getEmployeeName()).append(",");
-//        }
-//        String content = sb.toString();
-//        if (content.length() > 0) {
-//            content = content.substring(0, content.length() - 1);
-//        }
-//        return content;
-//
-//    }
 
 
     @RequestMapping(value = "/allocated_employee")
     @Transactional
     public AjaxResult list(@Valid OrderEmployee orderEmployee) {
-
-        TaskQueryBo taskQueryBo = new TaskQueryBo();
-        taskQueryBo.setDeleted(Constants.DELETED_NO);
-        taskQueryBo.setPlantCode(orderEmployee.getPlantCode());
-        taskQueryBo.setOrderDetailId(orderEmployee.getOrderDetailId());
-        List<Task> list = taskService.getList(taskQueryBo);
-
 
         List<Employee> employeeList = employeeService.getListByIds(orderEmployee.getEmployeeIds());
         if (employeeList.isEmpty()) {
@@ -155,7 +172,18 @@ public class OrderController {
         if (userOrderDetail == null) {
             return AjaxResult.warn("没有找到订单详情");
         }
+        TaskQueryBo taskQueryBo = new TaskQueryBo();
+        taskQueryBo.setEmployeeIdSet(orderEmployee.getEmployeeIds());
+        taskQueryBo.setOrderDetailId(userOrderDetail.getId());
+        taskQueryBo.setDeleted(Constants.DELETED_NO);
+        List<Task> list = taskService.getList(taskQueryBo);
+        Map<Long, Task> oldEmployeeMap = list.stream().collect(Collectors.toMap(Task::getEmployeeId, X -> X));
 
+        BigDecimal total = userOrderDetail.getTargetWeight() == null ? new BigDecimal(0) : new BigDecimal(userOrderDetail.getTargetWeight());
+        BigDecimal average = userOrderDetail.getTargetWeight() == null ? new BigDecimal(0) : new BigDecimal(userOrderDetail.getTargetWeight());
+        if (userOrderDetail.getTargetWeight() != null && employeeList.size() > 1) {
+            average = new BigDecimal(userOrderDetail.getTargetWeight()).divide(new BigDecimal(employeeList.size()), 2, BigDecimal.ROUND_HALF_UP);
+        }
         UserOrderQueryBo userOrderQueryBo = new UserOrderQueryBo();
         userOrderQueryBo.setPlantCode(orderEmployee.getPlantCode());
         userOrderQueryBo.setProcessOrderNo(userOrderDetail.getProcessOrderNo());
@@ -165,9 +193,22 @@ public class OrderController {
             return AjaxResult.warn("没有找到订单");
         }
         UserOrder order = orderList.get(0);
-        Task task = null;
-        if (list.isEmpty()) {
-            task = new Task();
+        for (int i = 0; i < employeeList.size(); i++) {
+            if (employeeList.size() > 1 && i == employeeList.size() - 1) {
+                BigDecimal front = new BigDecimal(employeeList.size() - 1);
+                average = total.subtract(average.multiply(front));
+            }
+            Employee employee = employeeList.get(i);
+            if (oldEmployeeMap.containsKey(employee.getId())) {
+                Task task = oldEmployeeMap.get(employee.getId());
+                task.setTargetWeight(average);
+                task.setModifyTime(new Date());
+                taskService.update(task);
+                oldEmployeeMap.remove(employee.getId());
+
+                continue;
+            }
+            Task task = new Task();
             task.setModifyTime(new Date());
             task.setOrderDetailId(orderEmployee.getOrderDetailId());
             task.setProcessOrderNo(userOrderDetail.getProcessOrderNo());
@@ -175,15 +216,18 @@ public class OrderController {
             task.setProcessOrderType(userOrderDetail.getProductionType());
             task.setPlanEndTime(order.getScheduleEndDate());
             task.setPlanStartTime(order.getScheduleStartDate());
+            task.setTargetWeight(average);
+            task.setEmployeeId(employee.getId());
+            task.setEmployeeCode(employee.getEmployeeNo());
             taskService.add(task);
-        } else {
-            task = list.get(0);
         }
-        if (task.getFinishedWeight() != null && task.getFinishedWeight().compareTo(new BigDecimal(0)) == 1) {
-            return AjaxResult.warn("订单已经开始，不能修改");
+        Iterator<Map.Entry<Long, Task>> iterator = oldEmployeeMap.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Long, Task> next = iterator.next();
+            Task value = next.getValue();
+            taskService.deleteById(value.getId());
         }
 
-        taskEmployeeService.init(task, employeeList);
         return AjaxResult.success("");
     }
 
@@ -209,27 +253,19 @@ public class OrderController {
 
     @RequestMapping(value = "/update_task")
     @Transactional
-    public AjaxResult list(Long id, String destination, BigDecimal finishedWeight) {
-        UserOrderDetail userOrderDetail = userOrderDetailService.getById(id);
-        if (userOrderDetail == null) {
-            return AjaxResult.warn("没有找到订单详情");
-        }
-        userOrderDetail.setDestination(destination);
-        userOrderDetailService.update(userOrderDetail);
-
-        TaskQueryBo taskQueryBo = new TaskQueryBo();
-        taskQueryBo.setOrderDetailId(userOrderDetail.getId());
-        taskQueryBo.setDeleted(Constants.DELETED_NO);
-        List<Task> list = taskService.getList(taskQueryBo);
-        if (list.isEmpty()) {
+    public AjaxResult list(Long taskId, String destination, BigDecimal finishedWeight, BigDecimal targetWeight) {
+        Task task = taskService.getById(taskId);
+        if (task == null) {
             return AjaxResult.warn("没有找到该任务");
         }
-        Task task = list.get(0);
         if (!StringUtils.isEmpty(destination)) {
             task.setDestination(destination);
         }
         if (finishedWeight != null) {
             task.setFinishedWeight(finishedWeight);
+        }
+        if (targetWeight != null) {
+            task.setTargetWeight(targetWeight);
         }
         taskService.update(task);
         return AjaxResult.success("");

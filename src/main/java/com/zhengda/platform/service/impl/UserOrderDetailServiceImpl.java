@@ -85,9 +85,15 @@ public class UserOrderDetailServiceImpl implements UserOrderDetailService {
         Date endTimeByDay = startTime == null ? null : DateUtils.getEndTimeByDay(new Date(endTime));
         return userOrderDetailDao.getListByUnallocated2(plantCode, startTimeByDay, endTimeByDay);
     }
+    @Override
+    public List<UserOrderDetail> getListByTime(String plantCode, Long startTime, Long endTime) {
+        Date startTimeByDay = startTime == null ? null : DateUtils.getStartTimeByDay(new Date(startTime));
+        Date endTimeByDay = startTime == null ? null : DateUtils.getEndTimeByDay(new Date(endTime));
+        return userOrderDetailDao.getListByTime(plantCode, startTimeByDay, endTimeByDay);
+    }
 
-    public List<UserOrderDetail> getListByAllocated(String plantCode) {
-        return userOrderDetailDao.getListByAllocated2(plantCode);
+    public List<UserOrderDetail> getListByAllocated(String plantCode,Set<Integer> statusSet) {
+        return userOrderDetailDao.getListByAllocated2(plantCode,statusSet);
     }
 
 }

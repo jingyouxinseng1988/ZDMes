@@ -74,6 +74,9 @@ public class TaskQueryBo extends BaseQueryBo {
     public void setEmployeeId(Long employeeId) {
         put("employeeId", employeeId);
     }
+    public void setEmployeeIdSet(Set<Long> employeeIdSet) {
+        put("employeeIdSet", employeeIdSet);
+    }
 
     public void setWorkPosition(String workPosition) {
         put("workPosition", workPosition);

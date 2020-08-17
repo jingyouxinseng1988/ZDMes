@@ -27,119 +27,138 @@
     <!-- （条件） -->
     <sql id="where">
         <where>
-                        <if test="ids != null and  ids.size > 0">
-                            and id in
-                            <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
-                            #{item}
-                            </foreach>
-                        </if>
-                        <if test="enterTime != null">
-                            and enter_time= #{enterTime,jdbcType=TIMESTAMP}
-                        </if>
-                        <if test="outTime != null">
-                            and out_time= #{outTime,jdbcType=TIMESTAMP}
-                        </if>
-                        <if test="processOrderNo != null and processOrderNo != ''">
-                            and process_order_no= #{processOrderNo,jdbcType=VARCHAR}
-                        </if>
-                        <if test="productType != null and productType != ''">
-                            and product_type= #{productType,jdbcType=VARCHAR}
-                        </if>
-                        <if test="productDesc != null and productDesc != ''">
-                            and product_desc= #{productDesc,jdbcType=VARCHAR}
-                        </if>
-                        <if test="productCode != null and productCode != ''">
-                            and product_code= #{productCode,jdbcType=VARCHAR}
-                        </if>
-                        <if test="productSpecifications != null and productSpecifications != ''">
-                            and product_specifications= #{productSpecifications,jdbcType=VARCHAR}
-                        </if>
-                        <if test="idNo != null">
-                            and id_no= #{idNo,jdbcType=INTEGER}
-                        </if>
-                        <if test="batchNo != null and batchNo != ''">
-                            and batch_no= #{batchNo,jdbcType=VARCHAR}
-                        </if>
-                        <if test="weight != null">
-                            and weight= #{weight,jdbcType=DECIMAL}
-                        </if>
-                        <if test="employeeId != null">
-                            and employee_id= #{employeeId,jdbcType=BIGINT}
-                        </if>
-                        <if test="employeeName != null and employeeName != ''">
-                            and employee_name= #{employeeName,jdbcType=VARCHAR}
-                        </if>
-                        <if test="createTime != null">
-                            and create_time= #{createTime,jdbcType=TIMESTAMP}
-                        </if>
-                        <if test="modifyTime != null">
-                            and modify_time= #{modifyTime,jdbcType=TIMESTAMP}
-                        </if>
-                        <if test="deleted != null">
-                            and deleted= #{deleted,jdbcType=INTEGER}
-                        </if>
-                        <if test="plantCode != null and plantCode != ''">
-                            and plant_code= #{plantCode,jdbcType=VARCHAR}
-                        </if>
-                        <if test="type != null">
-                            and type= #{type,jdbcType=INTEGER}
-                        </if>
+            <if test="ids != null and  ids.size > 0">
+                and id in
+                <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="enterTime != null">
+                and enter_time= #{enterTime,jdbcType=TIMESTAMP}
+            </if>
+
+
+            <if test="startTime != null and type=1">
+                and enter_time > #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and type=1">
+                and #{endTime,jdbcType=TIMESTAMP}> enter_time
+            </if>
+
+            <if test="startTime != null and type=2">
+                and out_time > #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and type=2">
+                and #{endTime,jdbcType=TIMESTAMP}> out_time
+            </if>
+
+
+            <if test="outTime != null">
+                and out_time= #{outTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="processOrderNo != null and processOrderNo != ''">
+                and process_order_no= #{processOrderNo,jdbcType=VARCHAR}
+            </if>
+            <if test="productType != null and productType != ''">
+                and product_type= #{productType,jdbcType=VARCHAR}
+            </if>
+            <if test="productDesc != null and productDesc != ''">
+                and product_desc= #{productDesc,jdbcType=VARCHAR}
+            </if>
+            <if test="productCode != null and productCode != ''">
+                and product_code= #{productCode,jdbcType=VARCHAR}
+            </if>
+            <if test="productSpecifications != null and productSpecifications != ''">
+                and product_specifications= #{productSpecifications,jdbcType=VARCHAR}
+            </if>
+            <if test="idNo != null">
+                and id_no= #{idNo,jdbcType=INTEGER}
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                and batch_no= #{batchNo,jdbcType=VARCHAR}
+            </if>
+            <if test="weight != null">
+                and weight= #{weight,jdbcType=DECIMAL}
+            </if>
+            <if test="employeeId != null">
+                and employee_id= #{employeeId,jdbcType=BIGINT}
+            </if>
+            <if test="employeeName != null and employeeName != ''">
+                and employee_name= #{employeeName,jdbcType=VARCHAR}
+            </if>
+            <if test="createTime != null">
+                and create_time= #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="modifyTime != null">
+                and modify_time= #{modifyTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="deleted != null">
+                and deleted= #{deleted,jdbcType=INTEGER}
+            </if>
+            <if test="plantCode != null and plantCode != ''">
+                and plant_code= #{plantCode,jdbcType=VARCHAR}
+            </if>
+            <if test="type != null">
+                and type= #{type,jdbcType=INTEGER}
+            </if>
         </where>
     </sql>
     <!-- （插入或更新） -->
     <sql id="saveSet">
         <trim prefix="" suffixOverrides=",">
-                        <if test="enterTime != null">
-                            enter_time= #{enterTime,jdbcType=TIMESTAMP},
-                        </if>
-                        <if test="outTime != null">
-                            out_time= #{outTime,jdbcType=TIMESTAMP},
-                        </if>
-                        <if test="processOrderNo != null and processOrderNo != ''">
-                            process_order_no= #{processOrderNo,jdbcType=VARCHAR},
-                        </if>
-                        <if test="productType != null and productType != ''">
-                            product_type= #{productType,jdbcType=VARCHAR},
-                        </if>
-                        <if test="productDesc != null and productDesc != ''">
-                            product_desc= #{productDesc,jdbcType=VARCHAR},
-                        </if>
-                        <if test="productCode != null and productCode != ''">
-                            product_code= #{productCode,jdbcType=VARCHAR},
-                        </if>
-                        <if test="productSpecifications != null and productSpecifications != ''">
-                            product_specifications= #{productSpecifications,jdbcType=VARCHAR},
-                        </if>
-                        <if test="idNo != null">
-                            id_no= #{idNo,jdbcType=INTEGER},
-                        </if>
-                        <if test="batchNo != null and batchNo != ''">
-                            batch_no= #{batchNo,jdbcType=VARCHAR},
-                        </if>
-                        <if test="weight != null">
-                            weight= #{weight,jdbcType=DECIMAL},
-                        </if>
-                        <if test="employeeId != null">
-                            employee_id= #{employeeId,jdbcType=BIGINT},
-                        </if>
-                        <if test="employeeName != null and employeeName != ''">
-                            employee_name= #{employeeName,jdbcType=VARCHAR},
-                        </if>
-                        <if test="createTime != null">
-                            create_time= #{createTime,jdbcType=TIMESTAMP},
-                        </if>
-                        <if test="modifyTime != null">
-                            modify_time= #{modifyTime,jdbcType=TIMESTAMP},
-                        </if>
-                        <if test="deleted != null">
-                            deleted= #{deleted,jdbcType=INTEGER},
-                        </if>
-                        <if test="plantCode != null and plantCode != ''">
-                            plant_code= #{plantCode,jdbcType=VARCHAR},
-                        </if>
-                        <if test="type != null">
-                            type= #{type,jdbcType=INTEGER},
-                        </if>
+            <if test="enterTime != null">
+                enter_time= #{enterTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="outTime != null">
+                out_time= #{outTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="processOrderNo != null and processOrderNo != ''">
+                process_order_no= #{processOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="productType != null and productType != ''">
+                product_type= #{productType,jdbcType=VARCHAR},
+            </if>
+            <if test="productDesc != null and productDesc != ''">
+                product_desc= #{productDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="productCode != null and productCode != ''">
+                product_code= #{productCode,jdbcType=VARCHAR},
+            </if>
+            <if test="productSpecifications != null and productSpecifications != ''">
+                product_specifications= #{productSpecifications,jdbcType=VARCHAR},
+            </if>
+            <if test="idNo != null">
+                id_no= #{idNo,jdbcType=INTEGER},
+            </if>
+            <if test="batchNo != null and batchNo != ''">
+                batch_no= #{batchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="weight != null">
+                weight= #{weight,jdbcType=DECIMAL},
+            </if>
+            <if test="employeeId != null">
+                employee_id= #{employeeId,jdbcType=BIGINT},
+            </if>
+            <if test="employeeName != null and employeeName != ''">
+                employee_name= #{employeeName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time= #{createTime,jdbcType=TIMESTAMP},
+            </if>
+
+
+            <if test="modifyTime != null">
+                modify_time= #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deleted != null">
+                deleted= #{deleted,jdbcType=INTEGER},
+            </if>
+            <if test="plantCode != null and plantCode != ''">
+                plant_code= #{plantCode,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type= #{type,jdbcType=INTEGER},
+            </if>
         </trim>
     </sql>
 
@@ -154,45 +173,45 @@
             keyProperty="id">
         insert into tunnel_library
         (
-                    enter_time,
-                    out_time,
-                    process_order_no,
-                    product_type,
-                    product_desc,
-                    product_code,
-                    product_specifications,
-                    id_no,
-                    batch_no,
-                    weight,
-                    employee_id,
-                    employee_name,
-                    create_time,
-                    modify_time,
-                    deleted,
-                    plant_code,
-                    type
+        enter_time,
+        out_time,
+        process_order_no,
+        product_type,
+        product_desc,
+        product_code,
+        product_specifications,
+        id_no,
+        batch_no,
+        weight,
+        employee_id,
+        employee_name,
+        create_time,
+        modify_time,
+        deleted,
+        plant_code,
+        type
         )
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (
             <trim prefix="" suffixOverrides=",">
-                    #{item.enterTime,jdbcType=TIMESTAMP},
-                    #{item.outTime,jdbcType=TIMESTAMP},
-                    #{item.processOrderNo,jdbcType=VARCHAR},
-                    #{item.productType,jdbcType=VARCHAR},
-                    #{item.productDesc,jdbcType=VARCHAR},
-                    #{item.productCode,jdbcType=VARCHAR},
-                    #{item.productSpecifications,jdbcType=VARCHAR},
-                    #{item.idNo,jdbcType=INTEGER},
-                    #{item.batchNo,jdbcType=VARCHAR},
-                    #{item.weight,jdbcType=DECIMAL},
-                    #{item.employeeId,jdbcType=BIGINT},
-                    #{item.employeeName,jdbcType=VARCHAR},
-                    #{item.createTime,jdbcType=TIMESTAMP},
-                    #{item.modifyTime,jdbcType=TIMESTAMP},
-                    #{item.deleted,jdbcType=INTEGER},
-                    #{item.plantCode,jdbcType=VARCHAR},
-                    #{item.type,jdbcType=INTEGER},
+                #{item.enterTime,jdbcType=TIMESTAMP},
+                #{item.outTime,jdbcType=TIMESTAMP},
+                #{item.processOrderNo,jdbcType=VARCHAR},
+                #{item.productType,jdbcType=VARCHAR},
+                #{item.productDesc,jdbcType=VARCHAR},
+                #{item.productCode,jdbcType=VARCHAR},
+                #{item.productSpecifications,jdbcType=VARCHAR},
+                #{item.idNo,jdbcType=INTEGER},
+                #{item.batchNo,jdbcType=VARCHAR},
+                #{item.weight,jdbcType=DECIMAL},
+                #{item.employeeId,jdbcType=BIGINT},
+                #{item.employeeName,jdbcType=VARCHAR},
+                #{item.createTime,jdbcType=TIMESTAMP},
+                #{item.modifyTime,jdbcType=TIMESTAMP},
+                #{item.deleted,jdbcType=INTEGER},
+                #{item.plantCode,jdbcType=VARCHAR},
+                #{item.type,jdbcType=INTEGER},
             </trim>
             )
         </foreach>
@@ -225,7 +244,7 @@
         from tunnel_library
         <include refid="where"/>
         <if test="column != null">
-            order by ${column}  ${sort}
+            order by ${column} ${sort}
         </if>
         <if test="offset != null">
             limit #{offset} , ${limit}
