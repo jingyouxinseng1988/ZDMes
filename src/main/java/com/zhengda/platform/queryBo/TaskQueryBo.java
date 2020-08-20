@@ -1,6 +1,7 @@
 package com.zhengda.platform.queryBo;
 
 
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -71,9 +72,18 @@ public class TaskQueryBo extends BaseQueryBo {
         put("employeeCode", employeeCode);
     }
 
-    public void setEmployeeId(Long employeeId) {
-        put("employeeId", employeeId);
+    public void setStatusSet(Set<Integer> statusSet) {
+        put("statusSet", statusSet);
     }
+
+    public void setStartTime(Date startTime) {
+        put("startTime", startTime);
+    }
+
+    public void setEndTime(Date endTime) {
+        put("endTime", endTime);
+    }
+
     public void setEmployeeIdSet(Set<Long> employeeIdSet) {
         put("employeeIdSet", employeeIdSet);
     }

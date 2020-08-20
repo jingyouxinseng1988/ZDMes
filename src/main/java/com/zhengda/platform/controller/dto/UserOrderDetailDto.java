@@ -145,6 +145,8 @@ public class UserOrderDetailDto {
     private Long scheduleStartDate;
     private Long scheduleEndDate;
 
+    private Boolean isAllocated;
+
     private String productionSpec;
 
     // 目的地

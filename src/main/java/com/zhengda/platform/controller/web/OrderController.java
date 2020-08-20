@@ -1,8 +1,9 @@
 package com.zhengda.platform.controller.web;
 
 import com.zhengda.platform.common.Constants;
+import com.zhengda.platform.controller.UserOrderDtailDto;
 import com.zhengda.platform.controller.dto.OrderEmployee;
-import com.zhengda.platform.controller.dto.PlantCodeDto;
+import com.zhengda.platform.controller.dto.TaskDto;
 import com.zhengda.platform.controller.dto.UserOrderDetailDto;
 import com.zhengda.platform.domain.AjaxResult;
 import com.zhengda.platform.entity.Employee;
@@ -42,17 +43,19 @@ public class OrderController {
     private EmployeeService employeeService;
 
     @RequestMapping(value = "/detail/list")
-    public AjaxResult getListByTime(@Valid PlantCodeDto plantCodeDto, Long startTime, Long endTime) {
+    public AjaxResult getListByTime(@Valid UserOrderDtailDto userOrderDtailDto) {
 
-        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByTime(plantCodeDto.getPlantCode(), startTime, endTime);
+        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByCondition(userOrderDtailDto);
 
 
+        Set<Long> ids = userOrderDetailList.stream().map(UserOrderDetail::getId).collect(Collectors.toSet());
         UserOrderQueryBo userOrderQueryBo = new UserOrderQueryBo();
         userOrderQueryBo.setDeleted(Constants.DELETED_NO);
-        userOrderQueryBo.setPlantCode(plantCodeDto.getPlantCode());
+        userOrderQueryBo.setPlantCode(userOrderDtailDto.getPlantCode());
         List<UserOrder> userOrderList = userOrderService.getList(userOrderQueryBo);
         Map<String, UserOrder> noMapOrder = userOrderList.stream().collect(Collectors.toMap(UserOrder::getProcessOrderNo, X -> X));
 
+        Map<Long, Boolean> haveTAsk = taskService.isHaveTAsk(ids);
 
         List<Object> data = new ArrayList<>();
         for (UserOrderDetail userOrderDetail : userOrderDetailList) {
@@ -61,60 +64,36 @@ public class OrderController {
             BeanUtils.copyProperties(userOrderDetail, userOrderDetailDto);
             userOrderDetailDto.setScheduleEndDate(userOrder != null && userOrder.getScheduleEndDate() == null ? 0 : userOrder.getScheduleEndDate().getTime());
             userOrderDetailDto.setScheduleStartDate(userOrder != null && userOrder.getScheduleStartDate() == null ? 0 : userOrder.getScheduleStartDate().getTime());
+            userOrderDetailDto.setIsAllocated(haveTAsk.get(userOrderDetail.getId()));
             data.add(userOrderDetailDto);
         }
         return AjaxResult.success(data);
     }
 
-    @RequestMapping(value = "/unallocated_list")
-    public AjaxResult allocatedList(@Valid PlantCodeDto plantCodeDto, Long startTime, Long endTime) {
-
-        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByUnallocated(plantCodeDto.getPlantCode(), startTime, endTime);
-
-
-        UserOrderQueryBo userOrderQueryBo = new UserOrderQueryBo();
-        userOrderQueryBo.setDeleted(Constants.DELETED_NO);
-        userOrderQueryBo.setPlantCode(plantCodeDto.getPlantCode());
-        List<UserOrder> userOrderList = userOrderService.getList(userOrderQueryBo);
-        Map<String, UserOrder> noMapOrder = userOrderList.stream().collect(Collectors.toMap(UserOrder::getProcessOrderNo, X -> X));
-
-
-        List<Object> data = new ArrayList<>();
-        for (UserOrderDetail userOrderDetail : userOrderDetailList) {
-            UserOrder userOrder = noMapOrder.get(userOrderDetail.getProcessOrderNo());
-            UserOrderDetailDto userOrderDetailDto = new UserOrderDetailDto();
-            BeanUtils.copyProperties(userOrderDetail, userOrderDetailDto);
-            userOrderDetailDto.setScheduleEndDate(userOrder != null && userOrder.getScheduleEndDate() == null ? 0 : userOrder.getScheduleEndDate().getTime());
-            userOrderDetailDto.setScheduleStartDate(userOrder != null && userOrder.getScheduleStartDate() == null ? 0 : userOrder.getScheduleStartDate().getTime());
-            data.add(userOrderDetailDto);
-        }
-        return AjaxResult.success(data);
-    }
 
     @RequestMapping(value = "/allocated_list")
-    public AjaxResult list(@Valid PlantCodeDto plantCodeDto) {
-        /**
-         * 已经分配的订单详情
-         */
+    public AjaxResult list(@Valid TaskDto taskDto) {
 
-        Set<Integer> statusSet = new HashSet<>();
-        if (plantCodeDto.getStatus() != null) {
-            statusSet.add(plantCodeDto.getStatus());
-            if (plantCodeDto.getStatus().equals(3) || plantCodeDto.getStatus().equals(2)) {
-                statusSet.add(2);
-                statusSet.add(3);
-            }
 
+        List<Task> taskList = taskService.getListByCondition(taskDto);
+
+
+        Set<Long> orderDetailIds = new HashSet<>();
+        for (Task entity : taskList) {
+            orderDetailIds.add(entity.getId());
         }
 
-        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByAllocated(plantCodeDto.getPlantCode(), statusSet);
+        List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByIds(orderDetailIds);
+
+
+        Map<Long, UserOrderDetail> orderDetailIdMap = userOrderDetailList.stream().collect(Collectors.toMap(UserOrderDetail::getId, X -> X));
 
         /**
          * 订单列表
          */
         UserOrderQueryBo userOrderQueryBo = new UserOrderQueryBo();
         userOrderQueryBo.setDeleted(Constants.DELETED_NO);
-        userOrderQueryBo.setPlantCode(plantCodeDto.getPlantCode());
+        userOrderQueryBo.setPlantCode(taskDto.getPlantCode());
         List<UserOrder> userOrderList = userOrderService.getList(userOrderQueryBo);
         Map<String, UserOrder> noMapOrder = userOrderList.stream().collect(Collectors.toMap(UserOrder::getProcessOrderNo, X -> X));
 
@@ -122,21 +101,17 @@ public class OrderController {
         /**
          * 获取任务的完成量
          */
-        Set<Long> detailIdSet = userOrderDetailList.stream().map(UserOrderDetail::getId).collect(Collectors.toSet());
-        List<Task> taskList = taskService.getListByOrderDetailIdSet(detailIdSet);
-        Map<Long, Task> orderDetailIdMap = new HashMap<>();
         Set<Long> employeeIdSet = new HashSet<>();
         for (Task task : taskList) {
-            orderDetailIdMap.put(task.getOrderDetailId(), task);
             employeeIdSet.add(task.getEmployeeId());
         }
 
         Map<Long, Employee> employeeMap = employeeService.getMapByIds(employeeIdSet);
 
         List<Object> data = new ArrayList<>();
-        for (UserOrderDetail userOrderDetail : userOrderDetailList) {
-            Task task = orderDetailIdMap.get(userOrderDetail.getId());
-            if (task == null) {
+        for (Task task : taskList) {
+            UserOrderDetail userOrderDetail = orderDetailIdMap.get(task.getOrderDetailId());
+            if (userOrderDetail == null) {
                 continue;
             }
             UserOrder userOrder = noMapOrder.get(userOrderDetail.getProcessOrderNo());
@@ -151,6 +126,8 @@ public class OrderController {
             userOrderDetailDto.setEmployeeName(employee == null ? "" : employee.getName());
             userOrderDetailDto.setStatus(task.getStatus());
             userOrderDetailDto.setTaskId(task.getId());
+            userOrderDetailDto.setTargetWeight(task.getTargetWeight() + "");
+            userOrderDetailDto.setFinishedWeight(task.getFinishedWeight());
             data.add(userOrderDetailDto);
 
         }
@@ -253,7 +230,7 @@ public class OrderController {
 
     @RequestMapping(value = "/update_task")
     @Transactional
-    public AjaxResult list(Long taskId, String destination, BigDecimal finishedWeight, BigDecimal targetWeight) {
+    public AjaxResult list(Long taskId, String destination, BigDecimal finishedWeight, BigDecimal targetWeight, Long employeeId) {
         Task task = taskService.getById(taskId);
         if (task == null) {
             return AjaxResult.warn("没有找到该任务");
@@ -267,7 +244,30 @@ public class OrderController {
         if (targetWeight != null) {
             task.setTargetWeight(targetWeight);
         }
+        if (employeeId == null) {
+            Employee employee = employeeService.getById(employeeId);
+            task.setEmployeeId(employee.getId());
+            task.setEmployeeCode(employee.getEmployeeNo());
+        }
         taskService.update(task);
+        return AjaxResult.success("");
+    }
+
+
+    @RequestMapping(value = "/update_order_detail")
+    @Transactional
+    public AjaxResult update_order_detail(Long id, String destination, BigDecimal targetWeight) {
+        UserOrderDetail orderDetail = userOrderDetailService.getById(id);
+        if (orderDetail == null) {
+            return AjaxResult.warn("没有找到该任务");
+        }
+        if (!StringUtils.isEmpty(destination)) {
+            orderDetail.setDestination(destination);
+        }
+        if (targetWeight != null) {
+            orderDetail.setTargetWeight(targetWeight.toString());
+        }
+        userOrderDetailService.update(orderDetail);
         return AjaxResult.success("");
     }
 

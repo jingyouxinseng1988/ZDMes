@@ -5,6 +5,7 @@
     <sql id="fields">
         select
             id id,
+            destination,
             enter_time enterTime,
             out_time outTime,
             process_order_no processOrderNo,
@@ -37,7 +38,24 @@
                 and enter_time= #{enterTime,jdbcType=TIMESTAMP}
             </if>
 
+            -- 出库
+            <if test="type != null and type=2">
+                and out_time != null
+            </if>
+            -- //库存
+            <if test="type != null and type=0">
+                and out_time != null
+            </if>
 
+            --库存范围查询
+            <if test="startTime != null and type=0">
+                and enter_time > #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null and type=0">
+                and #{endTime,jdbcType=TIMESTAMP}> enter_time
+            </if>
+
+            --入库范围查询
             <if test="startTime != null and type=1">
                 and enter_time > #{startTime,jdbcType=TIMESTAMP}
             </if>
@@ -45,6 +63,7 @@
                 and #{endTime,jdbcType=TIMESTAMP}> enter_time
             </if>
 
+            --出库范围查询
             <if test="startTime != null and type=2">
                 and out_time > #{startTime,jdbcType=TIMESTAMP}
             </if>
@@ -65,6 +84,13 @@
             <if test="productDesc != null and productDesc != ''">
                 and product_desc= #{productDesc,jdbcType=VARCHAR}
             </if>
+            <if test="productCodeLike != null and productCodeLike != ''">
+                and product_code like concat ('%',#{productCodeLike,jdbcType=VARCHAR},'%')
+            </if>
+            <if test="destinationLike != null and destinationLike != ''">
+                and destination like concat ('%',#{destinationLike,jdbcType=VARCHAR},'%')
+            </if>
+
             <if test="productCode != null and productCode != ''">
                 and product_code= #{productCode,jdbcType=VARCHAR}
             </if>
@@ -97,9 +123,6 @@
             </if>
             <if test="plantCode != null and plantCode != ''">
                 and plant_code= #{plantCode,jdbcType=VARCHAR}
-            </if>
-            <if test="type != null">
-                and type= #{type,jdbcType=INTEGER}
             </if>
         </where>
     </sql>

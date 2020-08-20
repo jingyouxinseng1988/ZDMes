@@ -5,12 +5,14 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class PlantCodeDto {
+public class LibDto {
     @NotBlank(message = "工厂编码不能为空")
     private String plantCode;
     private Long startTime;
     private Long endTime;
+    //1 入库 2 出库
     private Integer type;
-//    0 未开始 1 进行中 //2和3代表强制完成
     private Integer status;
+    private String destination;
+    private String productCodeLike;
 }

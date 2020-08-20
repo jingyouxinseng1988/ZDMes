@@ -1,6 +1,7 @@
 package com.zhengda.platform.service.impl;
 
 import com.zhengda.platform.common.Constants;
+import com.zhengda.platform.controller.UserOrderDtailDto;
 import com.zhengda.platform.dao.UserOrderDetailDao;
 import com.zhengda.platform.entity.UserOrderDetail;
 import com.zhengda.platform.queryBo.BaseQueryBo;
@@ -79,21 +80,19 @@ public class UserOrderDetailServiceImpl implements UserOrderDetailService {
         return map;
     }
 
-    @Override
-    public List<UserOrderDetail> getListByUnallocated(String plantCode, Long startTime, Long endTime) {
-        Date startTimeByDay = startTime == null ? null : DateUtils.getStartTimeByDay(new Date(startTime));
-        Date endTimeByDay = startTime == null ? null : DateUtils.getEndTimeByDay(new Date(endTime));
-        return userOrderDetailDao.getListByUnallocated2(plantCode, startTimeByDay, endTimeByDay);
-    }
-    @Override
-    public List<UserOrderDetail> getListByTime(String plantCode, Long startTime, Long endTime) {
-        Date startTimeByDay = startTime == null ? null : DateUtils.getStartTimeByDay(new Date(startTime));
-        Date endTimeByDay = startTime == null ? null : DateUtils.getEndTimeByDay(new Date(endTime));
-        return userOrderDetailDao.getListByTime(plantCode, startTimeByDay, endTimeByDay);
+    public List<UserOrderDetail> getListByCondition(UserOrderDtailDto dto) {
+        Date startTimeByDay = dto.getStartTime() == null ? null : DateUtils.getStartTimeByDay(new Date(dto.getStartTime()));
+        Date endTimeByDay = dto.getEndTime() == null ? null : DateUtils.getEndTimeByDay(new Date(dto.getEndTime()));
+        UserOrderDetailQueryBo userOrderDetailQueryBo = new UserOrderDetailQueryBo();
+        userOrderDetailQueryBo.setPlantCode(dto.getPlantCode());
+        userOrderDetailQueryBo.setStartTime(startTimeByDay);
+        userOrderDetailQueryBo.setEndTime(endTimeByDay);
+        userOrderDetailQueryBo.setDeleted(Constants.DELETED_NO);
+        userOrderDetailQueryBo.setProductionTypeLike(dto.getProductionType());
+        userOrderDetailQueryBo.setProductionNoLike(dto.getProductionNo());
+        List<UserOrderDetail> list = this.getList(userOrderDetailQueryBo);
+        return list;
     }
 
-    public List<UserOrderDetail> getListByAllocated(String plantCode,Set<Integer> statusSet) {
-        return userOrderDetailDao.getListByAllocated2(plantCode,statusSet);
-    }
 
 }

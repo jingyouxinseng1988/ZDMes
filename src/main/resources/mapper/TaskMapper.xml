@@ -58,7 +58,12 @@
                     #{item}
                 </foreach>
             </if>
-
+            <if test="statusSet != null and  statusSet.size > 0">
+                and status in
+                <foreach collection="statusSet" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="processOrderNo != null and processOrderNo != ''">
                 and process_order_no= #{processOrderNo,jdbcType=VARCHAR}
             </if>
@@ -74,6 +79,14 @@
             <if test="planEndTime != null">
                 and plan_end_time= #{planEndTime,jdbcType=TIMESTAMP}
             </if>
+            <if test="endTime != null">
+                and #{endTime}>= planStartTime
+            </if>
+            <if test="startTime != null">
+                and planStartTime>=#{startTime}
+            </if>
+
+
             <if test="productionType != null and productionType != ''">
                 and production_type= #{productionType,jdbcType=VARCHAR}
             </if>

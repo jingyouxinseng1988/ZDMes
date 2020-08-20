@@ -28,6 +28,10 @@ public class TunnelLibraryQueryBo extends BaseQueryBo {
         put("endTime", endTime);
     }
 
+    public void setEndTime(Boolean outTimeNotNull) {
+        put("enterTimeNull", true);
+    }
+
 
     public void setOutTime(java.util.Date outTime) {
         put("outTime", outTime);
@@ -47,6 +51,14 @@ public class TunnelLibraryQueryBo extends BaseQueryBo {
 
     public void setProductCode(String productCode) {
         put("productCode", productCode);
+    }
+
+    public void setDestinationLike(String destinationLike) {
+        put("destinationLike", destinationLike);
+    }
+
+    public void setProductCodeLike(String productCodeLike) {
+        put("productCodeLike", productCodeLike);
     }
 
     public void setProductSpecifications(String productSpecifications) {

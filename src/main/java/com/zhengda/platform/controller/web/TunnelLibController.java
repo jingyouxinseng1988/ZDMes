@@ -1,6 +1,7 @@
 package com.zhengda.platform.controller.web;
 
 import com.zhengda.platform.common.Constants;
+import com.zhengda.platform.controller.dto.LibDto;
 import com.zhengda.platform.controller.dto.PlantCodeDto;
 import com.zhengda.platform.domain.AjaxResult;
 import com.zhengda.platform.entity.TunnelLibrary;
@@ -29,15 +30,17 @@ public class TunnelLibController {
     private TunnelLibraryService tunnelLibraryService;
 
     @RequestMapping(value = "/list")
-    public AjaxResult allocatedList(@Valid PlantCodeDto plantCodeDto) {
-        Date startTimeByDay = plantCodeDto.getStartTime() == null ? null : DateUtils.getStartTimeByDay(new Date(plantCodeDto.getStartTime()));
-        Date endTimeByDay = plantCodeDto.getEndTime() == null ? null : DateUtils.getEndTimeByDay(new Date(plantCodeDto.getEndTime()));
+    public AjaxResult allocatedList(@Valid LibDto bibDto) {
+        Date startTimeByDay = bibDto.getStartTime() == null ? null : DateUtils.getStartTimeByDay(new Date(bibDto.getStartTime()));
+        Date endTimeByDay = bibDto.getEndTime() == null ? null : DateUtils.getEndTimeByDay(new Date(bibDto.getEndTime()));
         TunnelLibraryQueryBo tunnelLibraryQueryBo = new TunnelLibraryQueryBo();
         tunnelLibraryQueryBo.setDeleted(Constants.DELETED_NO);
-        tunnelLibraryQueryBo.setPlantCode(plantCodeDto.getPlantCode());
-        tunnelLibraryQueryBo.setType(plantCodeDto.getType());
+        tunnelLibraryQueryBo.setPlantCode(bibDto.getPlantCode());
+        tunnelLibraryQueryBo.setType(bibDto.getType());
         tunnelLibraryQueryBo.setStartTime(startTimeByDay);
         tunnelLibraryQueryBo.setEnterTime(endTimeByDay);
+        tunnelLibraryQueryBo.setDestinationLike(bibDto.getDestination());
+        tunnelLibraryQueryBo.setProductCodeLike(bibDto.getProductCodeLike());
         List<TunnelLibrary> list = tunnelLibraryService.getList(tunnelLibraryQueryBo);
         return AjaxResult.success(list);
     }
