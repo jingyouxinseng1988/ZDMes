@@ -10,6 +10,6 @@ import java.util.List;
  * 用户订单详情表服务接口。
  */
 public interface UserOrderDetailService extends BaseService<UserOrderDetail> {
-    List<UserOrderDetail> getListByCondition(UserOrderDtailDto dto)
+    List<UserOrderDetail> getListByCondition(UserOrderDtailDto dto);
 
 }

@@ -286,19 +286,19 @@
                 and order_id in ( select id from user_order
                 <where>
                     <if test="endTime != null">
-                        and #{endTime}>=uo.schedule_start_date
+                        and #{endTime}>=schedule_start_date
                     </if>
                     <if test="startTime != null">
-                        and uo.schedule_start_date>=#{startTime}
+                        and schedule_start_date>=#{startTime}
                     </if>
                 </where>
                 )
             </if>
             <if test="productionTypeLike != null and productionTypeLike != ''">
-                and ord.production_type like concat('%',#{productionTypeLike,jdbcType=VARCHAR},'%'),
+                and production_type like concat('%',#{productionTypeLike},'%')
             </if>
             <if test="productionNoLike != null and productionNoLike != ''">
-                and ord.production_no like concat('%',#{productionNoLike,jdbcType=VARCHAR},'%')
+                and production_no like concat('%',#{productionNoLike},'%')
             </if>
         </where>
     </sql>
@@ -617,9 +617,6 @@
         <include refid="fields"/>
         from user_order_detail
         <include refid="where"/>
-
-
-        SELECT id FROM `user_order` WHERE `schedule_start_date` `schedule_end_date` AND deleted=0
         <if test="column != null">
             order by ${column} ${sort}
         </if>

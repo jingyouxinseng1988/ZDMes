@@ -38,9 +38,9 @@ public class TunnelLibController {
         tunnelLibraryQueryBo.setPlantCode(bibDto.getPlantCode());
         tunnelLibraryQueryBo.setType(bibDto.getType());
         tunnelLibraryQueryBo.setStartTime(startTimeByDay);
-        tunnelLibraryQueryBo.setEnterTime(endTimeByDay);
+        tunnelLibraryQueryBo.setEndTime(endTimeByDay);
         tunnelLibraryQueryBo.setDestinationLike(bibDto.getDestination());
-        tunnelLibraryQueryBo.setProductCodeLike(bibDto.getProductCodeLike());
+        tunnelLibraryQueryBo.setProductCodeLike(bibDto.getProductCode());
         List<TunnelLibrary> list = tunnelLibraryService.getList(tunnelLibraryQueryBo);
         return AjaxResult.success(list);
     }

@@ -67,7 +67,9 @@ public class TaskQueryBo extends BaseQueryBo {
     public void setBatchCode(String batchCode) {
         put("batchCode", batchCode);
     }
-
+    public void setEmployeeId(Long employeeId) {
+        put("employeeId", employeeId);
+    }
     public void setEmployeeCode(String employeeCode) {
         put("employeeCode", employeeCode);
     }

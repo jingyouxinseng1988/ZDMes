@@ -34,42 +34,22 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="enterTime != null">
-                and enter_time= #{enterTime,jdbcType=TIMESTAMP}
+            <if test="type != null and type==2">
+                and out_time != ''
             </if>
-
-            -- 出库
-            <if test="type != null and type=2">
-                and out_time != null
+            <if test="type != null and  type==1">
+                and out_time is null
             </if>
-            -- //库存
-            <if test="type != null and type=0">
-                and out_time != null
-            </if>
-
-            --库存范围查询
-            <if test="startTime != null and type=0">
+            <if test="startTime != null ">
                 and enter_time > #{startTime,jdbcType=TIMESTAMP}
             </if>
-            <if test="endTime != null and type=0">
+            <if test="endTime != null">
                 and #{endTime,jdbcType=TIMESTAMP}> enter_time
             </if>
 
-            --入库范围查询
-            <if test="startTime != null and type=1">
-                and enter_time > #{startTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endTime != null and type=1">
-                and #{endTime,jdbcType=TIMESTAMP}> enter_time
-            </if>
 
-            --出库范围查询
-            <if test="startTime != null and type=2">
-                and out_time > #{startTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endTime != null and type=2">
-                and #{endTime,jdbcType=TIMESTAMP}> out_time
-            </if>
+
+
 
 
             <if test="outTime != null">

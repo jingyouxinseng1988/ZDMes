@@ -12,6 +12,7 @@ import com.zhengda.platform.queryBo.GroupQueryBo;
 import com.zhengda.platform.service.EmployeeGroupService;
 import com.zhengda.platform.service.EmployeeService;
 import com.zhengda.platform.service.GroupService;
+import com.zhengda.platform.util.MD5Utils;
 import com.zhengda.platform.util.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -110,6 +111,69 @@ public class GroupController {
         }
         return AjaxResult.success("");
     }
+
+    @RequestMapping(value = "/deleteEmployeeGroup")
+    @Transactional
+    public AjaxResult allocateEmployeeGroup(Long groupId, Long employeeId) {
+        if (groupId == null) {
+            return AjaxResult.warn("组Id不能为空");
+        }
+        if (employeeId == null) {
+            return AjaxResult.warn("员工Id不能为空");
+        }
+        EmployeeGroupQueryBo groupQueryBo = new EmployeeGroupQueryBo();
+        groupQueryBo.setGroupId(groupId);
+        groupQueryBo.setEmployeeId(employeeId);
+        groupQueryBo.setDeleted(Constants.DELETED_NO);
+        List<EmployeeGroup> list = employeeGroupService.getList(groupQueryBo);
+        for (EmployeeGroup eg : list) {
+            employeeGroupService.deleteById(eg.getId());
+        }
+        return AjaxResult.success("");
+    }
+
+    @RequestMapping(value = "/allocate_employee_to_group")
+    @Transactional
+    public AjaxResult allocateEmployeeGroup(@Valid AllocateNewEmployeeGroupDto allocateEmployeeGroupDto) {
+
+        Group group = groupService.getById(allocateEmployeeGroupDto.getGroupId());
+        if (group.getParentId().equals(0L)) {
+            return AjaxResult.warn("该组不能分配人员");
+        }
+
+        Employee employee = employeeService.getByEmployeeNo(allocateEmployeeGroupDto.getEmployeeNo(), allocateEmployeeGroupDto.getPlantCode());
+        if (employee == null) {
+            employee = new Employee();
+            employee.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
+            employee.setEmployeeNo(employee.getEmployeeNo());
+            employee.setPassword(MD5Utils.md5("123456"));
+            employeeService.add(employee);
+        }
+
+        EmployeeGroupQueryBo groupQueryBo = new EmployeeGroupQueryBo();
+        groupQueryBo.setGroupId(allocateEmployeeGroupDto.getGroupId());
+        groupQueryBo.setEmployeeId(employee.getId());
+        groupQueryBo.setDeleted(Constants.DELETED_NO);
+        groupQueryBo.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
+        List<EmployeeGroup> list = employeeGroupService.getList(groupQueryBo);
+        if (!list.isEmpty()) {
+            EmployeeGroup employeeGroup = list.get(0);
+            employeeGroup.setEmployeeId(employee.getId());
+            employeeGroup.setGroupId(allocateEmployeeGroupDto.getGroupId());
+            employeeGroup.setModifyTime(new Date());
+            employeeGroup.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
+            employeeGroupService.update(employeeGroup);
+        } else {
+            EmployeeGroup employeeGroup = new EmployeeGroup();
+            employeeGroup.setEmployeeId(employee.getId());
+            employeeGroup.setGroupId(allocateEmployeeGroupDto.getGroupId());
+            employeeGroup.setModifyTime(new Date());
+            employeeGroup.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
+            employeeGroupService.add(employeeGroup);
+        }
+        return AjaxResult.success("");
+    }
+
 
     @RequestMapping(value = "/list")
     public AjaxResult list(@Valid PlantCodeDto plantCodeDto) {

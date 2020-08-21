@@ -14,5 +14,5 @@ public class LibDto {
     private Integer type;
     private Integer status;
     private String destination;
-    private String productCodeLike;
+    private String productCode;
 }

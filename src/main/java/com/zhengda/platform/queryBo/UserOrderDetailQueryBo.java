@@ -233,10 +233,10 @@ public class UserOrderDetailQueryBo extends BaseQueryBo {
     }
 
     public void setStartTime(java.util.Date startTime) {
-        put("endTime", startTime);
+        put("startTime", startTime);
     }
 
     public void setEndTime(java.util.Date endTime) {
-        put("startTime", endTime);
+        put("endTime", endTime);
     }
 }

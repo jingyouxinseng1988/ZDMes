@@ -50,7 +50,6 @@ public class EmployeeController {
         employeeQueryBo = new EmployeeQueryBo();
         employeeQueryBo.setDeleted(Constants.DELETED_NO);
         employeeQueryBo.setPlantCode(registerEmployee.getPlantCode());
-        employeeQueryBo.setPhone(registerEmployee.getPhone());
         count = employeeService.getCount(employeeQueryBo);
         if (count > 0) {
             return AjaxResult.error("电话号码已经注册");
@@ -71,7 +70,7 @@ public class EmployeeController {
         EmployeeQueryBo employeeQueryBo = new EmployeeQueryBo();
         employeeQueryBo.setDeleted(Constants.DELETED_NO);
         employeeQueryBo.setPlantCode(loginDto.getPlantCode());
-        employeeQueryBo.setPhone(loginDto.getPhone());
+        employeeQueryBo.setEmployeeNo(loginDto.getEmployeeNo());
         List<Employee> list = employeeService.getList(employeeQueryBo);
         if (list.isEmpty()) {
             return AjaxResult.error("未注册");

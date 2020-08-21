@@ -9,4 +9,5 @@ public class EmployeeDto {
     private String name;
     private String phone;
     private String employeeNo;
+    private Integer role;
 }

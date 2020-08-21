@@ -14,6 +14,9 @@ public class OrderEmployee {
     private Long employeeId;
     @NotBlank(message = "工厂编码不能为空")
     private String plantCode;
-    @NotNull(message = "员工Id")
-    private Set<Long> employeeIds;
+
+    @NotBlank(message = "工厂编码编码不能为空")
+    private String employeeNos;
+
+
 }

@@ -73,17 +73,14 @@
             <if test="processOrderType != null and processOrderType != ''">
                 and process_order_type= #{processOrderType,jdbcType=VARCHAR}
             </if>
-            <if test="planStartTime != null">
-                and plan_start_time= #{planStartTime,jdbcType=TIMESTAMP}
-            </if>
             <if test="planEndTime != null">
                 and plan_end_time= #{planEndTime,jdbcType=TIMESTAMP}
             </if>
             <if test="endTime != null">
-                and #{endTime}>= planStartTime
+                and #{endTime}>= plan_start_time
             </if>
             <if test="startTime != null">
-                and planStartTime>=#{startTime}
+                and plan_start_time>=#{startTime}
             </if>
 
 
@@ -185,9 +182,17 @@
             <if test="employeeCode != null and employeeCode != ''">
                 employee_code= #{employeeCode,jdbcType=VARCHAR},
             </if>
+            <if test="employeeCodeNull != null and employeeCodeNull==true">
+                employee_code= null,
+            </if>
+
             <if test="destination != null and destination != ''">
                 destination= #{destination,jdbcType=VARCHAR},
             </if>
+            <if test="flag != null">
+                flag= #{flag},
+            </if>
+
             <if test="employeeId != null">
                 employee_id= #{employeeId,jdbcType=BIGINT},
             </if>

@@ -6,20 +6,18 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class AllocateEmployeeGroupDto {
+public class AllocateNewEmployeeGroupDto {
 
     @NotNull(message = "组ID不能为空")
-    private Long groupId ;
-    @NotNull(message = "Id不能为空")
-    private Long employeeId;
+    private Long groupId;
 
 
     @NotBlank(message = "工厂编码不能为空")
     private String plantCode;
-
-
-
-
+    @NotBlank(message = "员工姓名")
+    private String employeeNo;
+    @NotBlank(message = "员工名字")
+    private String name;
 
 
 }

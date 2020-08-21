@@ -1,6 +1,7 @@
 package com.zhengda.platform.entity;
 
 import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -53,6 +54,8 @@ public class Task {
         // 员工编码 
             private String employeeCode;
 
+    private Boolean employeeCodeNull;
+
         // 员工id 
             private Long employeeId;
 
@@ -84,6 +87,8 @@ public class Task {
             private String personnelStation;
 
             private String destination;
+
+            private Integer flag;
 
 
 }

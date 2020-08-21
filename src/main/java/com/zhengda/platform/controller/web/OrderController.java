@@ -80,7 +80,7 @@ public class OrderController {
 
         Set<Long> orderDetailIds = new HashSet<>();
         for (Task entity : taskList) {
-            orderDetailIds.add(entity.getId());
+            orderDetailIds.add(entity.getOrderDetailId());
         }
 
         List<UserOrderDetail> userOrderDetailList = userOrderDetailService.getListByIds(orderDetailIds);
@@ -139,7 +139,15 @@ public class OrderController {
     @Transactional
     public AjaxResult list(@Valid OrderEmployee orderEmployee) {
 
-        List<Employee> employeeList = employeeService.getListByIds(orderEmployee.getEmployeeIds());
+        List<Employee> employeeList = new ArrayList<>();
+
+        String[] split = orderEmployee.getEmployeeNos().split(",");
+        for (String employeeNo : split) {
+            Employee employee = employeeService.getByEmployeeNo(employeeNo, orderEmployee.getPlantCode());
+            if (employee == null) {
+                return AjaxResult.warn("员工没有找到,编号为：" + employeeNo);
+            }
+        }
         if (employeeList.isEmpty()) {
             return AjaxResult.warn("员工没有找到");
         }
@@ -150,7 +158,6 @@ public class OrderController {
             return AjaxResult.warn("没有找到订单详情");
         }
         TaskQueryBo taskQueryBo = new TaskQueryBo();
-        taskQueryBo.setEmployeeIdSet(orderEmployee.getEmployeeIds());
         taskQueryBo.setOrderDetailId(userOrderDetail.getId());
         taskQueryBo.setDeleted(Constants.DELETED_NO);
         List<Task> list = taskService.getList(taskQueryBo);
@@ -230,7 +237,7 @@ public class OrderController {
 
     @RequestMapping(value = "/update_task")
     @Transactional
-    public AjaxResult list(Long taskId, String destination, BigDecimal finishedWeight, BigDecimal targetWeight, Long employeeId) {
+    public AjaxResult list(Long taskId, String destination, BigDecimal finishedWeight, BigDecimal targetWeight, Long employeeId, String plantCode) {
         Task task = taskService.getById(taskId);
         if (task == null) {
             return AjaxResult.warn("没有找到该任务");
@@ -244,11 +251,16 @@ public class OrderController {
         if (targetWeight != null) {
             task.setTargetWeight(targetWeight);
         }
-        if (employeeId == null) {
+        if (employeeId != null) {
             Employee employee = employeeService.getById(employeeId);
+            if (employee == null) {
+                return AjaxResult.warn("没有找到员工");
+            }
+
             task.setEmployeeId(employee.getId());
             task.setEmployeeCode(employee.getEmployeeNo());
         }
+        task.setFlag(1);
         taskService.update(task);
         return AjaxResult.success("");
     }

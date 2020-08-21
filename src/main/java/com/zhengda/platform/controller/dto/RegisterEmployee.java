@@ -8,8 +8,6 @@ import javax.validation.constraints.NotBlank;
 public class RegisterEmployee {
     @NotBlank(message = "名字不能为空")
     private String name;//名字
-    @NotBlank(message = "电话不能为空")
-    private String phone;//电话
     @NotBlank(message = "工号不能为空")
     private String employeeNo;//工号
     @NotBlank(message = "工厂编码不能为空")
