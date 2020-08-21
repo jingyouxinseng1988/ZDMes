@@ -145,8 +145,9 @@ public class GroupController {
         if (employee == null) {
             employee = new Employee();
             employee.setPlantCode(allocateEmployeeGroupDto.getPlantCode());
-            employee.setEmployeeNo(employee.getEmployeeNo());
+            employee.setEmployeeNo(allocateEmployeeGroupDto.getEmployeeNo());
             employee.setPassword(MD5Utils.md5("123456"));
+            employee.setName(allocateEmployeeGroupDto.getName());
             employeeService.add(employee);
         }
 

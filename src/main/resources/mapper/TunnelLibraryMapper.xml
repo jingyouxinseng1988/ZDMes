@@ -5,7 +5,6 @@
     <sql id="fields">
         select
             id id,
-            destination,
             enter_time enterTime,
             out_time outTime,
             process_order_no processOrderNo,
@@ -22,7 +21,18 @@
             modify_time modifyTime,
             deleted deleted,
             plant_code plantCode,
-            type type
+            type type,
+            employee_no employeeNo,
+            team_group teamGroup,
+            source source,
+            destination destination,
+            number number,
+            unit unit,
+            tare tare,
+            bag_number bagNumber,
+            production_line productionLine,
+            flag flag,
+            upper_basket_time upperBasketTime
 
     </sql>
     <!-- （条件） -->
