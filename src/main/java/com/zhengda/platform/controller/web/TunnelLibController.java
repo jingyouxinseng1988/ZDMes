@@ -8,7 +8,6 @@ import com.zhengda.platform.entity.TunnelLibrary;
 import com.zhengda.platform.enums.TunnelLibraryType;
 import com.zhengda.platform.queryBo.TunnelLibraryQueryBo;
 import com.zhengda.platform.service.TunnelLibraryService;
-import com.zhengda.platform.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,8 +30,8 @@ public class TunnelLibController {
 
     @RequestMapping(value = "/list")
     public AjaxResult allocatedList(@Valid LibDto bibDto) {
-        Date startTimeByDay = bibDto.getStartTime() == null ? null : DateUtils.getStartTimeByDay(new Date(bibDto.getStartTime()));
-        Date endTimeByDay = bibDto.getEndTime() == null ? null : DateUtils.getEndTimeByDay(new Date(bibDto.getEndTime()));
+        Date startTimeByDay = bibDto.getStartTime() == null ? null : new Date(bibDto.getStartTime());
+        Date endTimeByDay = bibDto.getEndTime() == null ? null : new Date(bibDto.getEndTime());
         TunnelLibraryQueryBo tunnelLibraryQueryBo = new TunnelLibraryQueryBo();
         tunnelLibraryQueryBo.setDeleted(Constants.DELETED_NO);
         tunnelLibraryQueryBo.setPlantCode(bibDto.getPlantCode());

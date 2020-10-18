@@ -10,13 +10,12 @@ import java.util.Set;
 public class OrderEmployee {
     @NotNull(message = "订单详情Id")
     private Long orderDetailId;
-
-    private Long employeeId;
+    @NotBlank(message = "员工Ids不能为空")
+    private String employeeIds;
     @NotBlank(message = "工厂编码不能为空")
     private String plantCode;
 
-    @NotBlank(message = "工厂编码编码不能为空")
-    private String employeeNos;
+
 
 
 }

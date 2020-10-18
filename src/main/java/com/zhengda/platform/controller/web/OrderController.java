@@ -139,17 +139,15 @@ public class OrderController {
     @Transactional
     public AjaxResult list(@Valid OrderEmployee orderEmployee) {
 
-        List<Employee> employeeList = new ArrayList<>();
 
-        String[] split = orderEmployee.getEmployeeNos().split(",");
-        for (String employeeNo : split) {
-            Employee employee = employeeService.getByEmployeeNo(employeeNo, orderEmployee.getPlantCode());
-            if (employee == null) {
-                return AjaxResult.warn("员工没有找到,编号为：" + employeeNo);
-            }
+        Set<Long> employeeIds = new HashSet<>();
+        String[] split = orderEmployee.getEmployeeIds().split(",");
+        for (String employeeId : split) {
+            employeeIds.add(Long.valueOf(employeeId));
         }
+        List<Employee> employeeList = employeeService.getByEmployeeIds(employeeIds, orderEmployee.getPlantCode());
         if (employeeList.isEmpty()) {
-            return AjaxResult.warn("员工没有找到");
+            return AjaxResult.warn("员工没有找到,编号为：" + orderEmployee.getEmployeeIds());
         }
 
 
